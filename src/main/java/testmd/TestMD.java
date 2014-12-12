@@ -18,11 +18,11 @@ public class TestMD {
     private List<PermutationResult> newResults = new ArrayList<PermutationResult>();
     private List<Permutation> permutations = new ArrayList<Permutation>();
 
-    public static TestMD forTest(Class testClass, final String testName) {
-        return forTest(testClass.getName(), testName);
+    public static TestMD define(Class testClass, final String testName) {
+        return define(testClass.getName(), testName);
     }
 
-    public static TestMD forTest(final String testClass, final String testName) {
+    public static TestMD define(final String testClass, final String testName) {
         String key = testClass + ":" + testName;
         if (!instances.containsKey(key)) {
             final TestMD service = new TestMD(testClass, testName);

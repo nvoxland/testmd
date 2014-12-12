@@ -1,44 +1,91 @@
 package com.example
 
-import org.junit.Rule
 import spock.lang.Specification
+import spock.lang.Unroll
 import testmd.Permutation
-import testmd.junit.TestMDRule
+import testmd.TestMD
 
 class ExampleSpockTest extends Specification {
 
-    @Rule
-    def TestMDRule testmd
-
-    def "numbers are less than 10"() {
+    @Unroll
+    def "inserting data"() {
         expect:
-        testmd.permutation([number: number, weight: weight])
-                .addResult("multiple", number * 63)
-                .addResult("weighted", number * weight)
-                .run({ number < 10 } as Permutation.Verification)
+        ExampleLogic logic = new ExampleLogic();
+
+        //Using TestMD.define directly to avoid a separate accepted.md file for each permutation
+        def sql = logic.insertData(tableName, columns, values)
+        TestMD.define(this.class, "inserting data").permutation([table: tableName, columns: columns, values: values])
+                .addResult("sql", sql)
+                .run({
+            executeSql(sql)
+            assertDataInserted(tableName, columns, values)
+        } as Permutation.Verification)
 
         where:
-        number | weight
-        1      | 0.3
-        2      | 0.4
-        3      | 0.5
-        4      | 0.6
+        tableName | columns                                      | values
+        "person"  | ["name"] as String[]                         | ["Bob"] as Object[]
+        "person"  | ["age"] as String[]                          | [42] as Object[]
+        "person"  | ["name", "age"] as String[]                  | ["Joe", 55] as Object[]
+        "address" | ["address1", "address2", "city"] as String[] | ["121 Main", null, "New Town"] as Object[]
     }
 
-    def "numbers are more than 10 as a table"() {
+    @Unroll
+    def "inserting data formatted as a table"() {
         expect:
-        testmd.permutation([number: number, weight: weight])
-                .asTable(["number"])
-                .addResult("weighted", number * weight)
-                .run({ number > 10 } as Permutation.Verification)
+        ExampleLogic logic = new ExampleLogic();
+
+        //Using TestMD.define directly to avoid a separate accepted.md file for each permutation
+        def sql = logic.insertData(tableName, columns, values)
+        TestMD.define(this.class, "inserting data formatted as a table").permutation([table: tableName, columns: columns, values: values])
+                .asTable("columns", "values")
+                .addResult("sql", sql)
+                .run({
+            executeSql(sql)
+            assertDataInserted(tableName, columns, values)
+        } as Permutation.Verification)
 
         where:
-        number | weight
-        10     | 0.4
-        20     | 0.3
-        33     | 0.23
-        21     | 0.3
-        11     | 0.4
-        22     | 0.3
+        tableName | columns                                      | values
+        "person"  | ["name"] as String[]                         | ["Bob"] as Object[]
+        "person"  | ["age"] as String[]                          | [42] as Object[]
+        "person"  | ["name", "age"] as String[]                  | ["Joe", 55] as Object[]
+        "address" | ["address1", "address2", "city"] as String[] | ["121 Main", null, "New Town"] as Object[]
+        "address" | ["address1", "address2", "city"] as String[] | [null, null, null] as Object[]
+    }
+
+    @Unroll
+    def "query APIs"() {
+        expect:
+        ExampleLogic logic = new ExampleLogic();
+
+        //Using TestMD.define directly to avoid a separate accepted.md file for each permutation
+        def query = logic.queryService(version, keywords)
+        TestMD.define(this.class, "query API").permutation([keywords: keywords, version: version])
+                .asTable("keywords", "version")
+                .addResult("query", query)
+                .run({ assertQueryResults(query, keywords) } as Permutation.Verification)
+
+        where:
+        keywords             | version
+        "cars"               | 4
+        "testing examples"   | 3
+        "junit alternatives" | 3
+        "junit alternatives" | 3
+    }
+
+    def assertQueryResults(query, keywords) {
+        println "Executing ${query} and looking for ${keywords}"
+    }
+
+    def executeSql(sql) {
+        //logic to execute the SQL would go here
+        println "Executing ${sql}"
+    }
+
+    def assertDataInserted(String table, String[] columns, Object[] values) {
+        //normally do assertion logic here
+
+        println "Checking data in ${table} ${columns}"
+        //UNCOMMENT TO TEST FAILING TEST:     assert table == "person" : "Did not insert into " + table
     }
 }

@@ -20,10 +20,10 @@ public class TestMDRule extends TestWatcher {
     }
 
     public Permutation permutation(Map<String, Object> parameters) throws Exception {
-        return TestMD.forTest(testClassName, testName).permutation(parameters);
+        return TestMD.define(testClassName, testName).permutation(parameters);
     }
 
     public Permutation permutation() throws Exception {
-        return TestMD.forTest(testClassName, testName).permutation();
+        return TestMD.define(testClassName, testName).permutation();
     }
 }

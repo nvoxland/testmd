@@ -246,11 +246,11 @@ public class Permutation {
         public SetupResult run() throws Exception;
     }
 
-    public static interface Verification {
+    public static interface Verification extends Runnable {
         public void run();
     }
 
-    public static interface Cleanup {
+    public static interface Cleanup extends Runnable {
         public void run();
     }
 

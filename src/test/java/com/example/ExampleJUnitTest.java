@@ -4,8 +4,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import testmd.Permutation;
 import testmd.junit.TestMDRule;
+import testmd.util.StringUtils;
 
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
 
 public class ExampleJUnitTest {
 
@@ -13,45 +14,113 @@ public class ExampleJUnitTest {
     public TestMDRule testmd = new TestMDRule();
 
     @Test
-    public void numbersAreLessThan10() throws Exception {
-        Object[][] numberAndWeights = new Object[][]{new Object[]{1, 0.3}, new Object[]{2, 0.4}, new Object[]{3, 0.5}, new Object[]{4, 0.6}};
+    public void insertingData() throws Exception {
+        ExampleLogic logic = new ExampleLogic();
 
-        for (Object[] permutation : numberAndWeights) {
-            final int number = (Integer) permutation[0];
-            final double weight = (Double) permutation[1];
+        Object[][] permutations = new Object[][]{
+                new Object[]{"person", new String[]{"name"}, new Object[]{"Bob"}},
+                new Object[]{"person", new String[]{"age"}, new Object[]{42}},
+                new Object[]{"person", new String[]{"name", "age"}, new Object[]{"Joe", 55}},
+                new Object[]{"address", new String[]{"address1", "address2", "city"}, new Object[]{"121 Main", null, "New Town"}}
+        };
 
+        for (Object[] permutation : permutations) {
+            final String tableName = (String) permutation[0];
+            final String[] columns = (String[]) permutation[1];
+            final Object[] values = (Object[]) permutation[2];
+
+            final String sql = logic.insertData(tableName, columns, values);
             testmd.permutation()
-                    .addParameter("number", number)
-                    .addParameter("weight", weight)
-                    .addResult("multiple", number * 63)
-                    .addResult("weighted", number * weight)
+                    .addParameter("table", tableName)
+                    .addParameter("columns", columns)
+                    .addParameter("values", values)
+                    .addResult("sql", sql)
                     .run(new Permutation.Verification() {
                         @Override
                         public void run() {
-                            assertTrue(number < 10);
+                            executeSql(sql);
+                            assertDataInserted(tableName, columns, values);
                         }
                     });
         }
+
     }
 
     @Test
-    public void numbersAreMoreThan10AsATable() throws Exception {
-        Object[][] numberAndWeights = new Object[][]{new Object[]{11, 0.4}, new Object[]{20, 0.3}, new Object[]{33, 0.23}, new Object[]{21, 0.3}, new Object[]{11, 0.4}, new Object[]{22, 0.3}};
+    public void insertingDataFormattedAsTable() throws Exception {
+        ExampleLogic logic = new ExampleLogic();
 
-        for (Object[] permutation : numberAndWeights) {
-            final int number = (Integer) permutation[0];
-            final double weight = (Double) permutation[1];
+        Object[][] permutations = new Object[][]{
+                new Object[]{"person", new String[]{"name"}, new Object[]{"Bob"}},
+                new Object[]{"person", new String[]{"age"}, new Object[]{42}},
+                new Object[]{"person", new String[]{"name", "age"}, new Object[]{"Joe", 55}},
+                new Object[]{"address", new String[]{"address1", "address2", "city"}, new Object[]{"121 Main", null, "New Town"}}
+        };
 
-            testmd.permutation().addParameter("number", number)
-                    .addParameter("weigh", weight)
-                    .asTable("number")
-                    .addResult("weighted", number * weight)
+        for (Object[] permutation : permutations) {
+            final String tableName = (String) permutation[0];
+            final String[] columns = (String[]) permutation[1];
+            final Object[] values = (Object[]) permutation[2];
+
+            final String sql = logic.insertData(tableName, columns, values);
+            testmd.permutation()
+                    .addParameter("table", tableName)
+                    .addParameter("columns", columns)
+                    .addParameter("values", values)
+                    .asTable("columns", "values")
+                    .addResult("sql", sql)
                     .run(new Permutation.Verification() {
                         @Override
                         public void run() {
-                            assertTrue(number > 10);
+                            executeSql(sql);
+                            assertDataInserted(tableName, columns, values);
                         }
                     });
         }
+
+    }
+
+    @Test
+    public void queryAPI() throws Exception {
+        ExampleLogic logic = new ExampleLogic();
+
+        Object[][] permutations = new Object[][]{
+                new Object[]{"cars", 4},
+                new Object[]{"testing examples", 3},
+                new Object[]{"junit alternatives", 3},
+                new Object[]{"junit alternatives", 3}
+        };
+
+        for (Object[] permutation : permutations) {
+            final String keywords = (String) permutation[0];
+            int version = (Integer) permutation[1];
+            final String query = logic.queryService(version, keywords);
+            testmd.permutation().addParameter("keywords", keywords)
+                    .addParameter("version", version)
+                    .asTable("keywords", "version")
+                    .addResult("query", query)
+                    .run(new Permutation.Verification() {
+                        @Override
+                        public void run() {
+                            assertQueryResults(query, keywords);
+                        }
+                    });
+
+        }
+    }
+
+    private void assertDataInserted(String table, String[] columns, Object[] values) {
+        //normally do assertion logic here
+        System.out.println("Checking data in " + table + " " + StringUtils.join(Arrays.asList(columns), ", ", false) + ")");
+
+        //UNCOMMENT TO TEST FAILING TEST:     assert table == "person" : "Did not insert into " + table
+    }
+
+    private void executeSql(String sql) {
+        System.out.println("Executing " + sql);
+    }
+
+    private void assertQueryResults(String query, String keywords) {
+        System.out.println("Executing " + query + " and looking for " + keywords);
     }
 }
