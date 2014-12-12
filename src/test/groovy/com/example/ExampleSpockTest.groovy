@@ -1,16 +1,18 @@
 package com.example
 
+import org.junit.Rule
 import spock.lang.Specification
 import testmd.Permutation
-import testmd.TestMD
+import testmd.junit.TestMDRule
 
-class ExampleTest extends Specification {
+class ExampleSpockTest extends Specification {
+
+    @Rule
+    def TestMDRule testmd
 
     def "numbers are less than 10"() {
         expect:
-        def test = TestMD.forTest(ExampleTest.class.name, "numbers are less than 10")
-
-        test.permutation([number: number, weight: weight])
+        testmd.permutation([number: number, weight: weight])
                 .addResult("multiple", number * 63)
                 .addResult("weighted", number * weight)
                 .run({ number < 10 } as Permutation.Verification)
@@ -25,9 +27,7 @@ class ExampleTest extends Specification {
 
     def "numbers are more than 10 as a table"() {
         expect:
-        def test = TestMD.forTest(ExampleTest.class.name, "numbers are more than 10 as a table")
-
-        test.permutation([number: number, weight: weight])
+        testmd.permutation([number: number, weight: weight])
                 .asTable(["number"])
                 .addResult("weighted", number * weight)
                 .run({ number > 10 } as Permutation.Verification)

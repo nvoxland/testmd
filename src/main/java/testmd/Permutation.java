@@ -20,9 +20,11 @@ public class Permutation {
     private String key = "";
 
     protected Permutation(Map<String, Object> parameters) {
-        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-            if (entry.getValue() != null) {
-                addParameter(entry.getKey(), entry.getValue());
+        if (parameters != null) {
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                if (entry.getValue() != null) {
+                    addParameter(entry.getKey(), entry.getValue());
+                }
             }
         }
     }
@@ -52,13 +54,15 @@ public class Permutation {
         return results;
     }
 
-    public void addParameter(String key, Object value) {
+    public Permutation addParameter(String key, Object value) {
         addParameter(key, value, OutputFormat.DEFAULT);
+        return this;
     }
 
-    public void addParameter(String key, Object value, OutputFormat outputFormat) {
+    public Permutation addParameter(String key, Object value, OutputFormat outputFormat) {
         parameters.put(key, new Value(value, outputFormat));
         recomputeKey();
+        return this;
     }
 
     public Permutation addNote(String key, Object value) {
@@ -116,6 +120,14 @@ public class Permutation {
         return StringUtils.join(out, ", ", false);
     }
 
+    public Permutation asTable(String... tableParameters) {
+        if (tableParameters != null) {
+            asTable(Arrays.asList(tableParameters));
+        }
+
+        return this;
+    }
+
     public Permutation asTable(Collection<String> tableParameters) {
         this.tableParameters = new TreeSet<String>(tableParameters);
         return this;
@@ -131,7 +143,7 @@ public class Permutation {
         testManager.addNewResult(result);
     }
 
-    protected PermutationResult run(Verification verification, PermutationResult previousRun) throws Exception {
+    protected PermutationResult run(Verification verification, PermutationResult previousRun) throws Exception, AssertionError {
         if (verification == null) {
             throw new RuntimeException("No verification logic set");
         }
@@ -204,6 +216,9 @@ public class Permutation {
             } catch (CannotVerifyException e) {
                 return new PermutationResult.Unverified(e.getMessage(), this);
             } catch (Throwable e) {
+                if (e instanceof AssertionError) {
+                    throw (AssertionError) e;
+                }
                 String message = "Error executing verification\n" +
                         "Description: " + toString(parameters) + "\n" +
                         "Notes: " + toString(notes) + "\n" +

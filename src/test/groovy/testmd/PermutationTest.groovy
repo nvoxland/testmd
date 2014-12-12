@@ -22,6 +22,11 @@ class PermutationTest extends Specification {
                 .cleanup({ cleanupRunCount++ } as Permutation.Cleanup)
     }
 
+    def "constructor with null parameters"() {
+        expect:
+        new Permutation(null).getParameters().size() == 0
+    }
+
     def "run with no previous result"() {
         when:
         def result = permutation.run({ executeRunCount++ } as Permutation.Verification, null)

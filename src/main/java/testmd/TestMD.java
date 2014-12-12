@@ -18,6 +18,10 @@ public class TestMD {
     private List<PermutationResult> newResults = new ArrayList<PermutationResult>();
     private List<Permutation> permutations = new ArrayList<Permutation>();
 
+    public static TestMD forTest(Class testClass, final String testName) {
+        return forTest(testClass.getName(), testName);
+    }
+
     public static TestMD forTest(final String testClass, final String testName) {
         String key = testClass + ":" + testName;
         if (!instances.containsKey(key)) {
@@ -61,6 +65,10 @@ public class TestMD {
     private TestMD(String testClass, String testName) {
         this.testClass = testClass;
         this.testName = testName;
+    }
+
+    public Permutation permutation() throws Exception {
+        return permutation(null);
     }
 
     public Permutation permutation(Map<String, Object> parameters) throws Exception {
