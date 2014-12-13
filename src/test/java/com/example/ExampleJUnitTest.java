@@ -2,8 +2,8 @@ package com.example;
 
 import org.junit.Rule;
 import org.junit.Test;
-import testmd.Permutation;
 import testmd.junit.TestMDRule;
+import testmd.logic.Verification;
 import testmd.util.StringUtils;
 
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class ExampleJUnitTest {
                     .addParameter("columns", columns)
                     .addParameter("values", values)
                     .addResult("sql", sql)
-                    .run(new Permutation.Verification() {
+                    .run(new Verification() {
                         @Override
                         public void run() {
                             executeSql(sql);
@@ -69,7 +69,7 @@ public class ExampleJUnitTest {
                     .addParameter("values", values)
                     .asTable("columns", "values")
                     .addResult("sql", sql)
-                    .run(new Permutation.Verification() {
+                    .run(new Verification() {
                         @Override
                         public void run() {
                             executeSql(sql);
@@ -99,7 +99,7 @@ public class ExampleJUnitTest {
                     .addParameter("version", version)
                     .asTable("keywords", "version")
                     .addResult("query", query)
-                    .run(new Permutation.Verification() {
+                    .run(new Verification() {
                         @Override
                         public void run() {
                             assertQueryResults(query, keywords);

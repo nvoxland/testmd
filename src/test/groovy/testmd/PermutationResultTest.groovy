@@ -7,7 +7,7 @@ class PermutationResultTest extends Specification {
 
     def "constructor with permutation"() {
         when:
-        def format = new OutputFormat() {
+        def format = new ValueFormat() {
             @Override
             String format(Object value) {
                 return "REP"

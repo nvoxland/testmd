@@ -92,6 +92,9 @@ public class StringUtils {
         return join(list, delimiter, format, sorted);
     }
 
+    /**
+     * Returns given string trimmed. If null returns empty string.
+     */
     public static String trimToEmpty(String string) {
         if (string == null) {
             return "";
@@ -99,6 +102,9 @@ public class StringUtils {
         return string.trim();
     }
 
+    /**
+     * Returns given string trimmed. If resulting string is empty, returns null.
+     */
     public static String trimToNull(String string) {
         if (string == null) {
             return null;
@@ -111,13 +117,16 @@ public class StringUtils {
         }
     }
 
-    public static String pad(String value, int length) {
+    /**
+     * Returns given string value padded with spaces if its length is less than the minimumLength. If length is greater, the original value is returned.
+     */
+    public static String pad(String value, int minimumLength) {
         value = StringUtils.trimToEmpty(value);
-        if (value.length() >= length) {
+        if (value.length() >= minimumLength) {
             return value;
         }
 
-        return value + StringUtils.repeat(" ", length - value.length());
+        return value + StringUtils.repeat(" ", minimumLength - value.length());
     }
 
     /**
@@ -147,7 +156,7 @@ public class StringUtils {
     }
 
     /**
-     * Computes a small hash of the given string.
+     * Computes a short hash of the given string. Not secure, simply used to quickly identify a string.
      */
     public static String computeHash(String input) {
         if (input == null) {

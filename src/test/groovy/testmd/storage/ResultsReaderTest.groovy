@@ -1,7 +1,10 @@
-package testmd
+package testmd.storage
 
 import spock.lang.Specification
 import spock.lang.Unroll
+import testmd.PermutationResult
+import testmd.storage.ResultsReader
+import testmd.storage.ResultsWriter
 import testmd.util.StringUtils
 
 import static org.junit.Assert.fail

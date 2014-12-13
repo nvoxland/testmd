@@ -5,14 +5,14 @@ import testmd.util.StringUtils;
 import java.util.Arrays;
 import java.util.Collection;
 
-public abstract class OutputFormat {
+public abstract class ValueFormat {
 
 
-    public static final OutputFormat DEFAULT = new OutputFormat.DefaultFormat();
+    public static final ValueFormat DEFAULT = new ValueFormat.DefaultFormat();
 
     public abstract String format(Object value);
 
-    private static class DefaultFormat extends OutputFormat {
+    private static class DefaultFormat extends ValueFormat {
 
         private final ArrayFormat ARRAY = new ArrayFormat(this);
         private final CollectionFormat COLLECTION = new CollectionFormat(this);
@@ -43,11 +43,11 @@ public abstract class OutputFormat {
         }
     }
 
-    public static class ArrayFormat extends OutputFormat {
+    public static class ArrayFormat extends ValueFormat {
 
         private StringUtils.JoinFormat joinFormat;
 
-        public ArrayFormat(final OutputFormat joinFormat) {
+        public ArrayFormat(final ValueFormat joinFormat) {
             this.joinFormat = new StringUtils.JoinFormat() {
                 @Override
                 public String toString(Object obj) {
@@ -66,11 +66,11 @@ public abstract class OutputFormat {
         }
     }
 
-    public static class CollectionFormat extends OutputFormat {
+    public static class CollectionFormat extends ValueFormat {
 
         private StringUtils.JoinFormat joinFormat;
 
-        public CollectionFormat(final OutputFormat joinFormat) {
+        public CollectionFormat(final ValueFormat joinFormat) {
             this.joinFormat = new StringUtils.JoinFormat() {
                 @Override
                 public String toString(Object obj) {

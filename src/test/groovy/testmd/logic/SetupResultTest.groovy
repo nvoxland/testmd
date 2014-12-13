@@ -1,6 +1,7 @@
-package testmd
+package testmd.logic
 
 import spock.lang.Specification
+import testmd.logic.SetupResult
 
 class SetupResultTest extends Specification {
 
@@ -13,6 +14,6 @@ class SetupResultTest extends Specification {
         type                                         | valid | canVerify
         new SetupResult.OkResult()                   | true  | true
         new SetupResult.CannotVerify("test message") | true  | false
-        new SetupResult.Invalid("test message")      | false | false
+        new SetupResult.Skip("test message")      | false | false
     }
 }

@@ -1,11 +1,15 @@
-package testmd;
+package testmd.storage;
 
+import testmd.PermutationResult;
 import testmd.util.StringUtils;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
+/**
+ * Writes results to stored markdown-based file.
+ */
 public class ResultsWriter {
 
     private static final String SEPARATOR = "---------------------------------------";
@@ -51,8 +55,8 @@ public class ResultsWriter {
                 out.append(" (verified)");
             } else {
                 out.append(" _NOT VERIFIED");
-                if (result.getNotRanMessage() != null) {
-                    out.append(": ").append(result.getNotRanMessage());
+                if (result.getNotVerifiedMessage() != null) {
+                    out.append(": ").append(result.getNotVerifiedMessage());
                 }
                 out.append("_");
             }
@@ -137,7 +141,7 @@ public class ResultsWriter {
                     permutationNameColLength = result.getKey().length();
                 }
 
-                String verifiedMessage = StringUtils.trimToNull(result.getNotRanMessage());
+                String verifiedMessage = StringUtils.trimToNull(result.getNotVerifiedMessage());
                 if (verifiedMessage == null) {
                     verifiedMessage = String.valueOf(result.isVerified());
                 }

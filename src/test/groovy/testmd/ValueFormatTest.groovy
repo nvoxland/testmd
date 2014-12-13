@@ -3,9 +3,9 @@ package testmd
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class OutputFormatTest extends Specification {
+class ValueFormatTest extends Specification {
 
-    static otherFormat = new OutputFormat() {
+    static otherFormat = new ValueFormat() {
         @Override
         String format(Object value) {
             return "NOT " + value;
@@ -15,7 +15,7 @@ class OutputFormatTest extends Specification {
     @Unroll
     def "OutputFormat.DEFAULT format"() {
         expect:
-        OutputFormat.DEFAULT.format(input) == output
+        ValueFormat.DEFAULT.format(input) == output
 
         where:
         input                                                      | output
@@ -36,26 +36,26 @@ class OutputFormatTest extends Specification {
     @Unroll
     def "CollectionFormat format"() {
         expect:
-        new OutputFormat.CollectionFormat(itemFormat).format(input) == output
+        new ValueFormat.CollectionFormat(itemFormat).format(input) == output
 
         where:
         input                                                  | itemFormat           | output
-        null                                                   | OutputFormat.DEFAULT | null
-        [] as List                                             | OutputFormat.DEFAULT | ""
-        ["a string", 3L, 5.6F, Collection.class, null] as List | OutputFormat.DEFAULT | "a string, 3, 5.6, java.util.Collection, null"
+        null                                                   | ValueFormat.DEFAULT | null
+        [] as List                                             | ValueFormat.DEFAULT | ""
+        ["a string", 3L, 5.6F, Collection.class, null] as List | ValueFormat.DEFAULT | "a string, 3, 5.6, java.util.Collection, null"
         ["21", "65"]                                           | otherFormat          | "NOT 21, NOT 65"
     }
 
     @Unroll
     def "ArrayFormat format"() {
         expect:
-        new OutputFormat.ArrayFormat(itemFormat).format(input) == output
+        new ValueFormat.ArrayFormat(itemFormat).format(input) == output
 
         where:
         input                                                      | itemFormat           | output
-        null                                                       | OutputFormat.DEFAULT | null
-        [] as Object[]                                             | OutputFormat.DEFAULT | ""
-        ["a string", 3L, 5.6F, Collection.class, null] as Object[] | OutputFormat.DEFAULT | "a string, 3, 5.6, java.util.Collection, null"
+        null                                                       | ValueFormat.DEFAULT | null
+        [] as Object[]                                             | ValueFormat.DEFAULT | ""
+        ["a string", 3L, 5.6F, Collection.class, null] as Object[] | ValueFormat.DEFAULT | "a string, 3, 5.6, java.util.Collection, null"
         ["21", "65"] as Object[]                                   | otherFormat          | "NOT 21, NOT 65"
 
     }

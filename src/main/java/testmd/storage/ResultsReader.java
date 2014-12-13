@@ -1,5 +1,6 @@
-package testmd;
+package testmd.storage;
 
+import testmd.PermutationResult;
 import testmd.util.StringUtils;
 
 import java.io.BufferedReader;
@@ -9,6 +10,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Reads results from stored markdown file.
+ */
 public class ResultsReader {
 
     private enum Section {

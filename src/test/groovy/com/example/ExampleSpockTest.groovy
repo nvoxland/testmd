@@ -2,8 +2,8 @@ package com.example
 
 import spock.lang.Specification
 import spock.lang.Unroll
-import testmd.Permutation
 import testmd.TestMD
+import testmd.logic.Verification
 
 class ExampleSpockTest extends Specification {
 
@@ -12,14 +12,14 @@ class ExampleSpockTest extends Specification {
         expect:
         ExampleLogic logic = new ExampleLogic();
 
-        //Using TestMD.define directly to avoid a separate accepted.md file for each permutation
+        //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
         def sql = logic.insertData(tableName, columns, values)
-        TestMD.define(this.class, "inserting data").permutation([table: tableName, columns: columns, values: values])
+        TestMD.test(this.class, "inserting data").permutation([table: tableName, columns: columns, values: values])
                 .addResult("sql", sql)
                 .run({
             executeSql(sql)
             assertDataInserted(tableName, columns, values)
-        } as Permutation.Verification)
+        } as Verification)
 
         where:
         tableName | columns                                      | values
@@ -34,15 +34,15 @@ class ExampleSpockTest extends Specification {
         expect:
         ExampleLogic logic = new ExampleLogic();
 
-        //Using TestMD.define directly to avoid a separate accepted.md file for each permutation
+        //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
         def sql = logic.insertData(tableName, columns, values)
-        TestMD.define(this.class, "inserting data formatted as a table").permutation([table: tableName, columns: columns, values: values])
+        TestMD.test(this.class, "inserting data formatted as a table").permutation([table: tableName, columns: columns, values: values])
                 .asTable("columns", "values")
                 .addResult("sql", sql)
                 .run({
             executeSql(sql)
             assertDataInserted(tableName, columns, values)
-        } as Permutation.Verification)
+        } as Verification)
 
         where:
         tableName | columns                                      | values
@@ -58,12 +58,12 @@ class ExampleSpockTest extends Specification {
         expect:
         ExampleLogic logic = new ExampleLogic();
 
-        //Using TestMD.define directly to avoid a separate accepted.md file for each permutation
+        //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
         def query = logic.queryService(version, keywords)
-        TestMD.define(this.class, "query API").permutation([keywords: keywords, version: version])
+        TestMD.test(this.class, "query API").permutation([keywords: keywords, version: version])
                 .asTable("keywords", "version")
                 .addResult("query", query)
-                .run({ assertQueryResults(query, keywords) } as Permutation.Verification)
+                .run({ assertQueryResults(query, keywords) } as Verification)
 
         where:
         keywords             | version

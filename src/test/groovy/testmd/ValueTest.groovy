@@ -5,7 +5,7 @@ import spock.lang.Unroll
 
 class ValueTest extends Specification {
 
-    static otherFormat = new OutputFormat() {
+    def static otherFormat = new ValueFormat() {
         @Override
         String format(Object value) {
             return "NOT " + value;
@@ -25,9 +25,14 @@ class ValueTest extends Specification {
         where:
 
         baseValue  | outputFormat         | serialized
-        "a string" | OutputFormat.DEFAULT | "a string"
+        "a string" | ValueFormat.DEFAULT | "a string"
         "a string" | otherFormat          | "NOT a string"
-        131        | OutputFormat.DEFAULT | "131"
-        Collection | OutputFormat.DEFAULT | "java.util.Collection"
+        131        | ValueFormat.DEFAULT | "131"
+        Collection | ValueFormat.DEFAULT | "java.util.Collection"
+        null       | ValueFormat.DEFAULT | null
+        null       | null                 | null
+        null       | otherFormat         | "NOT null"
+        "a string" | null                 | "a string"
     }
+
 }

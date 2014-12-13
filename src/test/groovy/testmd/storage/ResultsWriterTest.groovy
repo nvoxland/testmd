@@ -1,6 +1,8 @@
-package testmd
+package testmd.storage
 
 import spock.lang.Specification
+import testmd.PermutationResult
+import testmd.storage.ResultsWriter
 import testmd.util.StringUtils
 
 class ResultsWriterTest extends Specification {
