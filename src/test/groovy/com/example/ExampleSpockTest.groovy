@@ -13,7 +13,7 @@ class ExampleSpockTest extends Specification {
         ExampleLogic logic = new ExampleLogic();
 
         //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
-        def sql = logic.insertData(tableName, columns, values)
+        def sql = logic.generateInsertSql(tableName, columns, values)
         TestMD.test(this.class, "inserting data").permutation([table: tableName, columns: columns, values: values])
                 .addResult("sql", sql)
                 .run({
@@ -35,7 +35,7 @@ class ExampleSpockTest extends Specification {
         ExampleLogic logic = new ExampleLogic();
 
         //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
-        def sql = logic.insertData(tableName, columns, values)
+        def sql = logic.generateInsertSql(tableName, columns, values)
         TestMD.test(this.class, "inserting data formatted as a table").permutation([table: tableName, columns: columns, values: values])
                 .asTable("columns", "values")
                 .addResult("sql", sql)
@@ -59,7 +59,7 @@ class ExampleSpockTest extends Specification {
         ExampleLogic logic = new ExampleLogic();
 
         //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
-        def query = logic.queryService(version, keywords)
+        def query = logic.generateQueryRequest(version, keywords)
         TestMD.test(this.class, "query API").permutation([keywords: keywords, version: version])
                 .asTable("keywords", "version")
                 .addResult("query", query)

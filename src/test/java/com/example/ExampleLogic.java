@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class ExampleLogic {
 
-    public String insertData(String tableName, String[] columns, Object[] values) {
+    public String generateInsertSql(String tableName, String[] columns, Object[] values) {
         String sql = "INSERT INTO "+tableName+" ("+ StringUtils.join(Arrays.asList(columns), ", ", false)+") VALUES (";
 
         int i=0;
@@ -26,7 +26,7 @@ public class ExampleLogic {
         return sql;
     }
 
-    public String queryService(int version, String keywords) {
+    public String generateQueryRequest(int version, String keywords) {
         return "/api/"+version+"/search.json?q="+(keywords.replace(" ", "+"));
     }
 }

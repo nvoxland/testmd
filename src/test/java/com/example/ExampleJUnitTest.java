@@ -3,15 +3,54 @@ package com.example;
 import org.junit.Rule;
 import org.junit.Test;
 import testmd.junit.TestMDRule;
-import testmd.logic.Verification;
+import testmd.logic.*;
 import testmd.util.StringUtils;
 
+import java.sql.Connection;
 import java.util.Arrays;
 
 public class ExampleJUnitTest {
 
     @Rule
     public TestMDRule testmd = new TestMDRule();
+    private Connection connection;
+
+    @Test
+    public void insertingData_simple() throws Exception {
+        final String tableName = "test_table";
+        final String[] columns = new String[]{"age", "name"};
+        final Object[] values = new Object[]{42, "Fred"};
+        final String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
+
+        testmd.permutation()
+                .addParameter("tableName", tableName)
+                .addParameter("columns", columns)
+                .addParameter("values", values)
+                .addResult("sql", sql)
+                .setup(new Setup() {
+                    @Override
+                    public void run() throws SetupResult {
+                        openConnection();
+                        if (connection == null) {
+                            throw new SetupResult.CannotVerify("Connection not available");
+                        }
+                        resetDatabase();
+                        throw SetupResult.OK;
+                    }
+                }).cleanup(new Cleanup() {
+                    @Override
+                    public void run() throws CleanupException {
+                        closeConnection();
+                    }
+        }).run(new Verification() {
+            @Override
+            public void run() throws CannotVerifyException, AssertionError {
+                executeSql(sql);
+                assertDataInserted(tableName, columns, values);
+            }
+        });
+        //NOTHING MORE TO ADD!
+    }
 
     @Test
     public void insertingData() throws Exception {
@@ -29,7 +68,7 @@ public class ExampleJUnitTest {
             final String[] columns = (String[]) permutation[1];
             final Object[] values = (Object[]) permutation[2];
 
-            final String sql = logic.insertData(tableName, columns, values);
+            final String sql = logic.generateInsertSql(tableName, columns, values);
             testmd.permutation()
                     .addParameter("table", tableName)
                     .addParameter("columns", columns)
@@ -43,7 +82,6 @@ public class ExampleJUnitTest {
                         }
                     });
         }
-
     }
 
     @Test
@@ -62,7 +100,7 @@ public class ExampleJUnitTest {
             final String[] columns = (String[]) permutation[1];
             final Object[] values = (Object[]) permutation[2];
 
-            final String sql = logic.insertData(tableName, columns, values);
+            final String sql = logic.generateInsertSql(tableName, columns, values);
             testmd.permutation()
                     .addParameter("table", tableName)
                     .addParameter("columns", columns)
@@ -94,7 +132,7 @@ public class ExampleJUnitTest {
         for (Object[] permutation : permutations) {
             final String keywords = (String) permutation[0];
             int version = (Integer) permutation[1];
-            final String query = logic.queryService(version, keywords);
+            final String query = logic.generateQueryRequest(version, keywords);
             testmd.permutation().addParameter("keywords", keywords)
                     .addParameter("version", version)
                     .asTable("keywords", "version")
@@ -123,4 +161,14 @@ public class ExampleJUnitTest {
     private void assertQueryResults(String query, String keywords) {
         System.out.println("Executing " + query + " and looking for " + keywords);
     }
+
+    private void openConnection() {
+    }
+
+    private void closeConnection() {
+    }
+
+    private void resetDatabase() {
+    }
+
 }
