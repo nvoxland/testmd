@@ -13,7 +13,7 @@ Results of new and previous results are stored in markdown-formatted files that 
 
 ![Quadrants](README.quadrants.png)
 
-**TestMD: _Correct When You Need It, Fast When You Don't&trade;_**
+**TestMD: _Complete When You Need It, Fast When You Don't&trade;_**
 
 
 ##Features
