@@ -1,13 +1,19 @@
-# TestMD: Fast Integration Testing For Java
+# TestMD: Fast Integration Testing (Java)
 
-Automated testing interactions between systems is difficult. The two standard options are:
+Automated testing of interactions between systems is difficult.
 
-- "Unit Testing" where you mock the external system so your tests can run quickly at the expense of not really knowing if your interaction is correct
-- "Integration Testing" where you actually interact with the external system which ensures the code is correct but the tests take far too long to execute and rely on specific environments to be set up
+Tests normally fall in two quadrants
+
+- **"Unit Testing"** which perform fast, but but require mocking all external systems to be fast. This makes your tests only as valid as your assertions since the interaction with the external system is never actually tested.
+- **"Integration Testing"** which ensures the interaction with the external system is correct, but at the expense tests that are not only slow but also reliant on specific environments which are not always available
 
 TestMD gives you the speed of unit testing with the safety of integration testing by tracking how the integration is done and performing a time-consuming integration test IF AND ONLY IF there has been a change.
 
 Results of new and previous results are stored in markdown-formatted files that are designed to be human readable both in pull requests and through github source views.
+
+![Quadrants](https://nvoxland.github.io/images/with-testmd.png)
+
+**TestMD: Correct When You Need It, Fast When You Don't&trade;**
 
 
 ##Features
