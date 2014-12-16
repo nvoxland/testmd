@@ -31,7 +31,7 @@ Results of new and previous results are stored in markdown-formatted files that 
 
 #### Write The Test ####
 
-The _insertData()_ method in [com.example.ExampleLogic](blob/master/src/test/java/com/example/ExampleLogic.java#L9) is a simple example of a class that generates SQL.
+The _insertData()_ method in [com.example.ExampleLogic](src/test/java/com/example/ExampleLogic.java#L9) is a simple example of a class that generates SQL.
 
 There are many permutation of values that can be passed into the method including null values so there are many tests that need to be to run. 
 
@@ -224,7 +224,7 @@ Within the _Verification_ call, you actually execute the genearted SQL, then run
 
 Now run your test method like you would run any JUnit test. The first time it executes, it will take longer to execute--especially if you have real database connection logic in openConnection() and executeSql.
 
-Running it a second time, however, will take no time at all. The secret is the [src/test/resources/com/example/ExampleJUnitTest.insertingData_simple.accepted.md](blob/master/src/test/resources/com/example/ExampleJUnitTest.insertingData_simple.accepted.md) file that gets created in on your file system. That file stores the fact that the *ExampleJUnitTest.insertingData_simple* test was ran successfully with "table=test_table, columns=[age, name] and values=[42, Fred]". It also lists the SQL that was executed as the result. 
+Running it a second time, however, will take no time at all. The secret is the [src/test/resources/com/example/ExampleJUnitTest.insertingData_simple.accepted.md](src/test/resources/com/example/ExampleJUnitTest.insertingData_simple.accepted.md) file that gets created in on your file system. That file stores the fact that the *ExampleJUnitTest.insertingData_simple* test was ran successfully with "table=test_table, columns=[age, name] and values=[42, Fred]". It also lists the SQL that was executed as the result.
 
 If you manually edit the sql stored in the accepted.md file and re-run your test, you will see that the SQL is re-executed and verified and the file is re-written as verified again. 
 
@@ -236,7 +236,7 @@ Whenever you have a new test using TestMD, commit the corresponding accepted.md 
 
 As you are working on your application, watch for changes to accepted.md files. Are there suddenly results that changed unexpectedly? Are those changes verified? The markdown format is designed to be easily readable in any diff program so watch them as part of every commit.
 
-Are you wondering what has been tested? The markdown format is also designed to be readable through GitHub or any other markdown compatible web view. Simply go to the directory containing your tests such as [src/test/resources/com/example](blob/master/src/test/resources/com/example/) and read through what has been tested.
+Are you wondering what has been tested? The markdown format is also designed to be readable through GitHub or any other markdown compatible web view. Simply go to the directory containing your tests such as [src/test/resources/com/example](src/test/resources/com/example/) and read through what has been tested.
 
 #### Multiple Permutation Per Test ####
 
@@ -282,7 +282,7 @@ public void insertingData() throws Exception {
 }
 ```  
 
-we define multiple permutations and then loop through them with a resulting file that looks like [src/test/resources/com/example/ExampleJUnitTest.insertingData.accepted.md](blob/master/src/test/resources/com/example/ExampleJUnitTest.insertingData.accepted.md)         
+we define multiple permutations and then loop through them with a resulting file that looks like [src/test/resources/com/example/ExampleJUnitTest.insertingData.accepted.md](src/test/resources/com/example/ExampleJUnitTest.insertingData.accepted.md)
 
 #### Formatting Permutations As A Table ####
 
@@ -326,7 +326,7 @@ public void insertingDataFormattedAsTable() throws Exception {
 }
 ```  
 
-will save the results as [src/test/resources/com/example/ExampleJUnitTest.insertingDataFormattedAsTable.accepted.md](blob/master/src/test/resources/com/example/ExampleJUnitTest.insertingDataFormattedAsTable.accepted.md). 
+will save the results as [src/test/resources/com/example/ExampleJUnitTest.insertingDataFormattedAsTable.accepted.md](src/test/resources/com/example/ExampleJUnitTest.insertingDataFormattedAsTable.accepted.md).
 
 Functionality-wise there is no difference between table-formatted and regular-formatted accepted.md files. Chose purely on what is most readable for each test.        
 
