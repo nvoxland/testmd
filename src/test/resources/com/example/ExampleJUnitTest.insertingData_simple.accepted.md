@@ -4,7 +4,7 @@ NOTE: This output is generated and parsed by TestMD. Please read it, but DO NOT 
 
 ---------------------------------------
 
-## Permutation 7d22eb _NOT VERIFIED: Connection not available_ ##
+## Permutation 7d22eb (verified) ##
 
 - **columns:** age, name
 - **tableName:** test_table

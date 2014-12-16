@@ -31,9 +31,9 @@ public class ExampleJUnitTest {
                     @Override
                     public void run() throws SetupResult {
                         openConnection();
-                        if (connection == null) {
-                            throw new SetupResult.CannotVerify("Connection not available");
-                        }
+//                        if (connection == null) {
+//                            throw new SetupResult.CannotVerify("Connection not available");
+//                        }
                         resetDatabase();
                         throw SetupResult.OK;
                     }
