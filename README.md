@@ -1,6 +1,6 @@
 # TestMD: Fast Integration Testing For Java
 
-See [http://testmd.org] For Full Information
+### See http://testmd.org for all the details
 
 - If you have any bugs or feature enhancements, use the Github Project Issues
 - Pull requests area always appreciated
