@@ -13,24 +13,24 @@ The _insertData()_ method in [com.example.ExampleLogic](src/test/java/com/exampl
 
 If you are using JUnit, it is easiest to use the _TestMDRule_ class to automatically manage test naming. For more control, see [testmd.TestMd](http://nvoxland.github.io/testmd/javadoc/testmd/TestMD.html).
 
-```
+{% highlight java %}
 @Rule
 public TestMDRule testmd = new TestMDRule();
-```
+{% endhighlight %}
 
 You can then begin writing your test by capturing the output of _insertData_ for your input under test
 
-```java
+{% highlight java %}
 @Test
 public void insertingData_simple() throws Exception {
-String tableName = "test_table";
-String[] columns = new String[] {"age", "name"};
-Object[] values = new Object[] {42, "Fred"};
-String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
+    String tableName = "test_table";
+    String[] columns = new String[] {"age", "name"};
+    Object[] values = new Object[] {42, "Fred"};
+    String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
 
-//GOING TO ADD MORE HERE
+    //GOING TO ADD MORE HERE
 }
-```
+{% endhighlight %}
 
 All the test is doing so far is calling the method that generates an insert statement and saving the SQL for testing. At this point, there should be no calls out to external systems or anything else that would slow the test execution because this portion of the test is ALWAYS executed.
 
@@ -40,21 +40,21 @@ Once you have the SQL, we will use TestMD to ensure that it is correct by actual
 
 First, we define a new permutation and describe it with parameters. The parameters uniquely identify the permutation:
 
-```java
+{% highlight java %}
 @Test
 public void insertingData_simple() throws Exception {
-String tableName = "test_table";
-String[] columns = new String[] {"age", "name"};
-Object[] values = new Object[] {42, "Fred"};
-String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
+    String tableName = "test_table";
+    String[] columns = new String[] {"age", "name"};
+    Object[] values = new Object[] {42, "Fred"};
+    String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
 
-testmd.permutation()
-.addParameter("tableName", tableName)
-.addParameter("columns", columns)
-.addParameter("values", values);
-//GOING TO ADD MORE HERE
+    testmd.permutation()
+        .addParameter("tableName", tableName)
+        .addParameter("columns", columns)
+        .addParameter("values", values);
+    //GOING TO ADD MORE HERE
 }
-```
+{% endhighlight %}
 
 Notice that the _TestMD_ object is designed to simply chain method calls together for an easier to read test. You should add a parameter for each key/value that helps uniquely identify this particular test case.
 
@@ -62,22 +62,22 @@ Notice that the _TestMD_ object is designed to simply chain method calls togethe
 
 Once we have a parameters defined, we add our "results" to the permutation:
 
-```java
+{% highlight java %}
 @Test
 public void insertingData_simple() throws Exception {
-String tableName = "test_table";
-String[] columns = new String[] {"age", "name"};
-Object[] values = new Object[] {42, "Fred"};
-String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
+    String tableName = "test_table";
+    String[] columns = new String[] {"age", "name"};
+    Object[] values = new Object[] {42, "Fred"};
+    String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
 
-testmd.permutation()
-.addParameter("tableName", tableName)
-.addParameter("columns", columns)
-.addParameter("values", values)
-.addResult("sql", sql);
-//GOING TO ADD MORE HERE
+    testmd.permutation()
+        .addParameter("tableName", tableName)
+        .addParameter("columns", columns)
+        .addParameter("values", values)
+        .addResult("sql", sql);
+    //GOING TO ADD MORE HERE
 }
-```
+{% endhighlight %}
 
 You can include as many result key/value pairs as you need and if any of them are different, the permutation will be re-verified. In our case, we just have one result to worry about.
 
@@ -86,35 +86,35 @@ You can include as many result key/value pairs as you need and if any of them ar
 Now that we have the permutation defined, we can add logic for how to test it (if needed). First, there is usually some setup that needs to be done. This may include connecting to the database, truncating existing data, or anything else you need:
 
 
-```java
+{% highlight java %}
 private Connection connection;
 
 @Test
 public void insertingData_simple() throws Exception {
-String tableName = "test_table";
-String[] columns = new String[] {"age", "name"};
-Object[] values = new Object[] {42, "Fred"};
-String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
+    String tableName = "test_table";
+    String[] columns = new String[] {"age", "name"};
+    Object[] values = new Object[] {42, "Fred"};
+    String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
 
-testmd.permutation()
-.addParameter("tableName", tableName)
-.addParameter("columns", columns)
-.addParameter("values", values)
-.addResult("sql", sql)
-.setup(new Setup() {
-@Override
-public void run() throws SetupResult {
-openConnection();
-if (connection == null) {
-throw new SetupResult.CannotVerify("Connection not available");
+    testmd.permutation()
+        .addParameter("tableName", tableName)
+        .addParameter("columns", columns)
+        .addParameter("values", values)
+        .addResult("sql", sql)
+        .setup(new Setup() {
+            @Override
+            public void run() throws SetupResult {
+                openConnection();
+                if (connection == null) {
+                    throw new SetupResult.CannotVerify("Connection not available");
+                }
+                resetDatabase();
+                throw SetupResult.OK;
+            }
+        });
+    //GOING TO ADD MORE HERE
 }
-resetDatabase();
-throw SetupResult.OK;
-}
-});
-//GOING TO ADD MORE HERE
-}
-```
+{% endhighlight %}
 
 If you cannot set up the environment for testing, throw SetupResult.CannotVerify. If everything is correctly set up, throw SetupResult.OK.
 
@@ -122,44 +122,44 @@ If you cannot set up the environment for testing, throw SetupResult.CannotVerify
 
 If anything needs to be cleaned up after the test runs, add a "cleanup" call:
 
-```java
+{% highlight java %}
 @Test
 public void insertingData_simple() throws Exception {
-String tableName = "test_table";
-String[] columns = new String[]{"age", "name"};
-Object[] values = new Object[]{42, "Fred"};
-String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
+    String tableName = "test_table";
+    String[] columns = new String[]{"age", "name"};
+    Object[] values = new Object[]{42, "Fred"};
+    String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
 
-testmd.permutation()
-.addParameter("tableName", tableName)
-.addParameter("columns", columns)
-.addParameter("values", values)
-.addResult("sql", sql)
-.setup(new Setup() {
-@Override
-public void run() throws SetupResult {
-openConnection();
-if (connection == null) {
-throw new SetupResult.CannotVerify("Connection not available");
+    testmd.permutation()
+        .addParameter("tableName", tableName)
+        .addParameter("columns", columns)
+        .addParameter("values", values)
+        .addResult("sql", sql)
+        .setup(new Setup() {
+            @Override
+            public void run() throws SetupResult {
+                openConnection();
+                if (connection == null) {
+                    throw new SetupResult.CannotVerify("Connection not available");
+                }
+                resetDatabase();
+                throw SetupResult.OK;
+            }
+        }).cleanup(new Cleanup() {
+            @Override
+                public void run() throws CleanupException {
+                    closeConnection();
+            }
+        });
+    //GOING TO ADD MORE HERE
 }
-resetDatabase();
-throw SetupResult.OK;
-}
-}).cleanup(new Cleanup() {
-@Override
-public void run() throws CleanupException {
-closeConnection();
-}
-});
-//GOING TO ADD MORE HERE
-}
-```
+{% endhighlight %}
 
 #### Define Assertion Logic ####
 
 We are now ready for our actual assertions and our final code:
 
-```java
+{% highlight java %}
 public class ExampleJUnitTest {
 
 @Rule
@@ -168,41 +168,41 @@ private Connection connection;
 
 @Test
 public void insertingData_simple() throws Exception {
-final String tableName = "test_table";
-final String[] columns = new String[]{"age", "name"};
-final Object[] values = new Object[]{42, "Fred"};
-final String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
+    final String tableName = "test_table";
+    final String[] columns = new String[]{"age", "name"};
+    final Object[] values = new Object[]{42, "Fred"};
+    final String sql = new ExampleLogic().generateInsertSql(tableName, columns, values);
 
-testmd.permutation()
-.addParameter("tableName", tableName)
-.addParameter("columns", columns)
-.addParameter("values", values)
-.addResult("sql", sql)
-.setup(new Setup() {
-@Override
-public void run() throws SetupResult {
-openConnection();
-if (connection == null) {
-throw new SetupResult.CannotVerify("Connection not available");
+    testmd.permutation()
+        .addParameter("tableName", tableName)
+        .addParameter("columns", columns)
+        .addParameter("values", values)
+        .addResult("sql", sql)
+        .setup(new Setup() {
+            @Override
+            public void run() throws SetupResult {
+                openConnection();
+                if (connection == null) {
+                    throw new SetupResult.CannotVerify("Connection not available");
+                }
+                resetDatabase();
+                throw SetupResult.OK;
+            }
+        }).cleanup(new Cleanup() {
+            @Override
+            public void run() throws CleanupException {
+                closeConnection();
+            }
+        }).run(new Verification() {
+            @Override
+            public void run() throws CannotVerifyException, AssertionError {
+                executeSql(sql);
+                assertDataInserted(tableName, columns, values);
+            }
+        });
+    }
 }
-resetDatabase();
-throw SetupResult.OK;
-}
-}).cleanup(new Cleanup() {
-@Override
-public void run() throws CleanupException {
-closeConnection();
-}
-}).run(new Verification() {
-@Override
-public void run() throws CannotVerifyException, AssertionError {
-executeSql(sql);
-assertDataInserted(tableName, columns, values);
-}
-});
-}
-}
-```
+{% endhighlight %}
 
 Within the _Verification_ call, you actually execute the genearted SQL, then run any assertion logic you need to ensure that it runs successfully.
 
@@ -232,39 +232,39 @@ For a given testClass/testName combination, you can define as many permutations 
 
 In this test:
 
-```java
+{% highlight java %}
 @Test
 public void insertingData() throws Exception {
-ExampleLogic logic = new ExampleLogic();
+    ExampleLogic logic = new ExampleLogic();
 
-Object[][] permutations = new Object[][]{
-new Object[]{"person", new String[]{"name"}, new Object[]{"Bob"}},
-new Object[]{"person", new String[]{"age"}, new Object[]{42}},
-new Object[]{"person", new String[]{"name", "age"}, new Object[]{"Joe", 55}},
-new Object[]{"address", new String[]{"address1", "address2", "city"}, new Object[]{"121 Main", null, "New Town"}}
-};
+    Object[][] permutations = new Object[][]{
+        new Object[]{"person", new String[]{"name"}, new Object[]{"Bob"}},
+        new Object[]{"person", new String[]{"age"}, new Object[]{42}},
+        new Object[]{"person", new String[]{"name", "age"}, new Object[]{"Joe", 55}},
+        new Object[]{"address", new String[]{"address1", "address2", "city"}, new Object[]{"121 Main", null, "New Town"}}
+    };
 
-for (Object[] permutation : permutations) {
-final String tableName = (String) permutation[0];
-final String[] columns = (String[]) permutation[1];
-final Object[] values = (Object[]) permutation[2];
+    for (Object[] permutation : permutations) {
+        final String tableName = (String) permutation[0];
+        final String[] columns = (String[]) permutation[1];
+        final Object[] values = (Object[]) permutation[2];
 
-final String sql = logic.generateInsertSql(tableName, columns, values);
-testmd.permutation()
-.addParameter("table", tableName)
-.addParameter("columns", columns)
-.addParameter("values", values)
-.addResult("sql", sql)
-.run(new Verification() {
-@Override
-public void run() {
-executeSql(sql);
-assertDataInserted(tableName, columns, values);
+        final String sql = logic.generateInsertSql(tableName, columns, values);
+        testmd.permutation()
+            .addParameter("table", tableName)
+            .addParameter("columns", columns)
+            .addParameter("values", values)
+            .addResult("sql", sql)
+            .run(new Verification() {
+                @Override
+                public void run() {
+                    executeSql(sql);
+                    assertDataInserted(tableName, columns, values);
+                }
+            });
+    }
 }
-});
-}
-}
-```
+{% endhighlight %}
 
 we define multiple permutations and then loop through them with a resulting file that looks like [src/test/resources/com/example/ExampleJUnitTest.insertingData.accepted.md](src/test/resources/com/example/ExampleJUnitTest.insertingData.accepted.md)
 
@@ -274,41 +274,40 @@ Depending on what is being tested, it sometimes helps readability to group permu
 
 For example:
 
-```java
+{% highlight java %}
 @Test
 public void insertingDataFormattedAsTable() throws Exception {
-ExampleLogic logic = new ExampleLogic();
+    ExampleLogic logic = new ExampleLogic();
 
-Object[][] permutations = new Object[][]{
-new Object[]{"person", new String[]{"name"}, new Object[]{"Bob"}},
-new Object[]{"person", new String[]{"age"}, new Object[]{42}},
-new Object[]{"person", new String[]{"name", "age"}, new Object[]{"Joe", 55}},
-new Object[]{"address", new String[]{"address1", "address2", "city"}, new Object[]{"121 Main", null, "New Town"}}
-};
+    Object[][] permutations = new Object[][]{
+        new Object[]{"person", new String[]{"name"}, new Object[]{"Bob"}},
+        new Object[]{"person", new String[]{"age"}, new Object[]{42}},
+        new Object[]{"person", new String[]{"name", "age"}, new Object[]{"Joe", 55}},
+        new Object[]{"address", new String[]{"address1", "address2", "city"}, new Object[]{"121 Main", null, "New Town"}}
+    };
 
-for (Object[] permutation : permutations) {
-final String tableName = (String) permutation[0];
-final String[] columns = (String[]) permutation[1];
-final Object[] values = (Object[]) permutation[2];
+    for (Object[] permutation : permutations) {
+        final String tableName = (String) permutation[0];
+        final String[] columns = (String[]) permutation[1];
+        final Object[] values = (Object[]) permutation[2];
 
-final String sql = logic.generateInsertSql(tableName, columns, values);
-testmd.permutation()
-.addParameter("table", tableName)
-.addParameter("columns", columns)
-.addParameter("values", values)
-.asTable("columns", "values")
-.addResult("sql", sql)
-.run(new Verification() {
-@Override
-public void run() {
-executeSql(sql);
-assertDataInserted(tableName, columns, values);
+        final String sql = logic.generateInsertSql(tableName, columns, values);
+        testmd.permutation()
+            .addParameter("table", tableName)
+            .addParameter("columns", columns)
+            .addParameter("values", values)
+            .asTable("columns", "values")
+            .addResult("sql", sql)
+            .run(new Verification() {
+                @Override
+                public void run() {
+                    executeSql(sql);
+                    assertDataInserted(tableName, columns, values);
+                }
+        });
+    }
 }
-});
-}
-
-}
-```
+{% endhighlight %}
 
 will save the results as [src/test/resources/com/example/ExampleJUnitTest.insertingDataFormattedAsTable.accepted.md](src/test/resources/com/example/ExampleJUnitTest.insertingDataFormattedAsTable.accepted.md).
 
@@ -320,36 +319,36 @@ TestMD works well any time you are able to describe the interaction between two 
 
 REST-style webservices work well with TestMD:
 
-```java
+{% highlight java %}
 @Test
 public void queryAPI() throws Exception {
-ExampleLogic logic = new ExampleLogic();
+    ExampleLogic logic = new ExampleLogic();
 
-Object[][] permutations = new Object[][]{
-new Object[]{"cars", 4},
-new Object[]{"testing examples", 3},
-new Object[]{"junit alternatives", 3},
-new Object[]{"junit alternatives", 3}
-};
+    Object[][] permutations = new Object[][]{
+        new Object[]{"cars", 4},
+        new Object[]{"testing examples", 3},
+        new Object[]{"junit alternatives", 3},
+        new Object[]{"junit alternatives", 3}
+    };
 
-for (Object[] permutation : permutations) {
-final String keywords = (String) permutation[0];
-int version = (Integer) permutation[1];
-final String query = logic.generateQueryRequest(version, keywords);
-testmd.permutation().addParameter("keywords", keywords)
-.addParameter("version", version)
-.asTable("keywords", "version")
-.addResult("query", query)
-.run(new Verification() {
-@Override
-public void run() {
-assertQueryResults(query, keywords);
-}
-});
+    for (Object[] permutation : permutations) {
+        final String keywords = (String) permutation[0];
+        int version = (Integer) permutation[1];
+        final String query = logic.generateQueryRequest(version, keywords);
+        testmd.permutation().addParameter("keywords", keywords)
+            .addParameter("version", version)
+            .asTable("keywords", "version")
+            .addResult("query", query)
+            .run(new Verification() {
+                @Override
+                public void run() {
+                    assertQueryResults(query, keywords);
+                }
+        });
 
+    }
 }
-}
-```
+{% endhighlight %}
 
 As do:
 
@@ -361,7 +360,7 @@ As do:
 
 TestMD is designed to work well with the Spock testing framework. Because of the improved permutation support in Spock, the tests tend to be even cleaner than JUnit.
 
-```groovy
+{% highlight groovy %}
 @Unroll
 def "inserting data"() {
 expect:
@@ -370,11 +369,11 @@ ExampleLogic logic = new ExampleLogic();
 //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
 def sql = logic.generateInsertSql(tableName, columns, values)
 TestMD.test(this.class, "inserting data").permutation([table: tableName, columns: columns, values: values])
-.addResult("sql", sql)
-.run({
-executeSql(sql)
-assertDataInserted(tableName, columns, values)
-} as Verification)
+    .addResult("sql", sql)
+    .run({
+        executeSql(sql)
+        assertDataInserted(tableName, columns, values)
+    } as Verification)
 
 where:
 tableName | columns                                      | values
@@ -383,7 +382,7 @@ tableName | columns                                      | values
 "person"  | ["name", "age"] as String[]                  | ["Joe", 55] as Object[]
 "address" | ["address1", "address2", "city"] as String[] | ["121 Main", null, "New Town"] as Object[]
 }
-```
+{% endhighlight %}
 
 ## Final Details ##
 
