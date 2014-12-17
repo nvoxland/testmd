@@ -21,6 +21,11 @@ title: TestMD | Fast Integration Testing for Java
 
         <h2 style="margin-top:40px;color: #5B9BD5"><b>TestMD</b> | <i>There When You Need It. Fast When You Don't&trade;</i>
         </h2>
+
+        <center style="margin-top:40px">
+            <a href="https://github.com/nvoxland/testmd/releases/download/0.5/testmd-0.5.jar" class="btn btn-primary btn-lg" role="button" style="margin-right:20px">Download &raquo;</a>
+            <a href="/getting_started.html" class="btn btn-info btn-lg" role="button">Getting Started &raquo;</a>
+        </center>
     </div>
 </div>
 
