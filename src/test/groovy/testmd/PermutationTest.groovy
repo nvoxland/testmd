@@ -3,10 +3,7 @@ package testmd
 import spock.lang.Specification
 import spock.lang.Unroll
 import testmd.logic.CannotVerifyException
-import testmd.logic.Cleanup
-import testmd.logic.Setup
 import testmd.logic.SetupResult
-import testmd.logic.Verification
 
 
 class PermutationTest extends Specification {
@@ -23,8 +20,8 @@ class PermutationTest extends Specification {
 
         permutation = new Permutation([a: 1, b: 2])
                 .addResult("out", 100)
-                .setup({setupRunCount++; throw SetupResult.OK} as Setup)
-                .cleanup({ cleanupRunCount++ } as Cleanup)
+                .setup({setupRunCount++; throw SetupResult.OK})
+                .cleanup({ cleanupRunCount++ })
     }
 
     def "constructor with null parameters"() {
@@ -34,7 +31,7 @@ class PermutationTest extends Specification {
 
     def "run with no previous result"() {
         when:
-        def result = permutation.run({ executeRunCount++ } as Verification, null)
+        def result = permutation.run({ executeRunCount++ }, null)
 
         then:
         setupRunCount == 1
@@ -50,7 +47,7 @@ class PermutationTest extends Specification {
         when:
         def previousRun = new PermutationResult.Verified(permutation)
 
-        def result = permutation.run({ executeRunCount++ } as Verification, previousRun)
+        def result = permutation.run({ executeRunCount++ }, previousRun)
 
         then:
         setupRunCount == 0
@@ -65,7 +62,7 @@ class PermutationTest extends Specification {
     def "run when previous previous run was not verified"() {
         when:
         def previousRun = new PermutationResult.Unverified("Test message", permutation)
-        def result = permutation.run({ executeRunCount++ } as Verification, previousRun)
+        def result = permutation.run({ executeRunCount++ }, previousRun)
 
         then:
         setupRunCount == 1
@@ -83,7 +80,7 @@ class PermutationTest extends Specification {
         def previousRun = new PermutationResult.Verified()
         previousRun.setParameters(["a": "1", "b": "2"])
         previousRun.setResults(output)
-        def result = permutation.run({ executeRunCount++ } as Verification, previousRun)
+        def result = permutation.run({ executeRunCount++ }, previousRun)
 
         then:
         setupRunCount == 1
@@ -101,8 +98,8 @@ class PermutationTest extends Specification {
 
     def "run when setup throws exception"() {
         when:
-        permutation.setup({throw new RuntimeException("Testing exception")} as Setup)
-        permutation.run({ executeRunCount++ } as Verification, null)
+        permutation.setup({throw new RuntimeException("Testing exception")})
+        permutation.run({ executeRunCount++ }, null)
 
         then:
         def e = thrown(RuntimeException)
@@ -113,7 +110,7 @@ class PermutationTest extends Specification {
 
     def "run when verification throws exception"() {
         when:
-        permutation.run({ throw new RuntimeException("verification problem") } as Verification, null)
+        permutation.run({ throw new RuntimeException("verification problem") }, null)
 
         then:
         def e = thrown(RuntimeException)
@@ -123,8 +120,8 @@ class PermutationTest extends Specification {
 
     def "run when setup returns CannotVerify"() {
         when:
-        permutation.setup({setupRunCount++; throw new SetupResult.CannotVerify("cannot verify message")} as Setup)
-        def result = permutation.run({ executeRunCount++ } as Verification, null)
+        permutation.setup({setupRunCount++; throw new SetupResult.CannotVerify("cannot verify message")})
+        def result = permutation.run({ executeRunCount++ }, null)
 
         then:
         setupRunCount == 1
@@ -138,8 +135,8 @@ class PermutationTest extends Specification {
 
     def "run when setup returns Invalid"() {
         when:
-        permutation.setup({setupRunCount++; throw new SetupResult.Skip("invalid message")} as Setup)
-        def result = permutation.run({ executeRunCount++ } as Verification, null)
+        permutation.setup({setupRunCount++; throw new SetupResult.Skip("invalid message")})
+        def result = permutation.run({ executeRunCount++ }, null)
 
         then:
         setupRunCount == 1
@@ -153,8 +150,8 @@ class PermutationTest extends Specification {
 
     def "run when setup returns null"() {
         when:
-        permutation.setup({setupRunCount++;} as Setup)
-        permutation.run({ executeRunCount++ } as Verification, null)
+        permutation.setup({setupRunCount++;})
+        permutation.run({ executeRunCount++ }, null)
 
         then:
         def e = thrown(RuntimeException)
@@ -167,8 +164,8 @@ class PermutationTest extends Specification {
 
     def "run when cleanup throws an error"() {
         when:
-        permutation.cleanup({throw new RuntimeException("cleanup error")} as Cleanup)
-        permutation.run({ executeRunCount++ } as Verification, null)
+        permutation.cleanup({throw new RuntimeException("cleanup error")})
+        permutation.run({ executeRunCount++ }, null)
 
         then:
         def e = thrown(RuntimeException)
@@ -193,7 +190,7 @@ class PermutationTest extends Specification {
 
     def "run when verification logic throws CannotVerifyException"() {
         when:
-        def result = permutation.run({ executeRunCount++; throw new CannotVerifyException("testing not verify") } as Verification, null)
+        def result = permutation.run({ executeRunCount++; throw new CannotVerifyException("testing not verify") }, null)
 
         then:
         setupRunCount == 1

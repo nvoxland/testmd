@@ -15,10 +15,10 @@ import java.util.*;
  * <ol>
  * <li>A previous run (if any) is looked up by comparing the values stored in {@link #addParameter(String, Object)} with previous runs</li>
  * <li>If a previous run is found and it was "verified", the values from {@link #addResult(String, Object)} are compared with the previous run and if the results are the same this test is assumed to be correct still and finished.</li>
- * <li>The {@link testmd.logic.Setup} implementation defined by {@link #setup(testmd.logic.Setup)}.</li>
- * <li>If the Setup object pass, the {@link testmd.logic.Verification} test defined by {@link #run(testmd.logic.Verification)} is executed</li>
+ * <li>The setup implementation defined by {@link #setup(Runnable)}.</li>
+ * <li>If the Setup object pass, the verification test defined by {@link #run(Runnable)} is executed</li>
  * <li>If run throws exceptions, the results are not saved and the test fails. If all permutations pass the results are saved for future tests.</li>
- * <li>Regardless of Setup and Verification, the {@link testmd.logic.Cleanup} object defined by {@link #cleanup(testmd.logic.Cleanup)} is executed</li>
+ * <li>Regardless of Setup and Verification, the Runnable object defined by {@link #cleanup(Runnable)} is executed</li>
  * </ol>
  * <br><br>
  * Format and additional information in the saved results can be managed with {@link #addNote(String, Object)} and {@link #asTable(java.util.Collection)}
@@ -30,8 +30,8 @@ public class Permutation {
     private Map<String, Value> results = new HashMap<String, Value>();
     private Map<String, Value> notes = new HashMap<String, Value>();
 
-    private Setup setup;
-    private Cleanup cleanup;
+    private Runnable setup;
+    private Runnable cleanup;
 
     private TestMD testManager;
 
@@ -149,25 +149,64 @@ public class Permutation {
     }
 
     /**
-     * Defines the {@link testmd.logic.Setup} logic to use for this permutation
+     * Defines the setup logic to use for this permutation.
+     * Runnable is passed for cleaner Spock tests, but an exception must be thrown describing if the setup was successful.
+     * Throwing an exception for a result is strange, but needed due to Groovy syntax.
+     * <ul>
+     * <li>If {@link testmd.logic.SetupResult.Skip} is thrown, the permutation is skipped</li>
+     * <li>If {@link testmd.logic.SetupResult.CannotVerify} is thrown, the permutation marked as "Cannot Verify" and the verification is not ran</li>
+     * <li>If {@link testmd.logic.SetupResult#OK} is thrown, the permutation can be verified if need be</li>
+     * </ul>
+     * <b>IF NO EXCEPTION IS THROWN, THE TEST WILL THROW AN ERROR AND FAIL</b>
      */
-    public Permutation setup(Setup setup) {
+    public Permutation setup(Runnable setup) {
         this.setup = setup;
         return this;
     }
 
     /**
-     * Defines the {@link testmd.logic.Cleanup} logic to use for this permutation
+     * Alternative to {@link #setup(Runnable)} if you would rather return a {@link testmd.logic.SetupResult} from your logic instead of throwing it.
+     * A SetupResult object must still be returned, if null is returned the test will throw an error.
      */
-    public Permutation cleanup(Cleanup cleanup) {
+    public Permutation setup(final Setup setup) {
+        return this.setup(new Runnable() {
+            @Override
+            public void run() {
+                SetupResult result = setup.run();
+                if (result == null) {
+                    throw new SetupResult.CannotVerify("No SetupResult returned from testmd.logic.Setup implementation "+setup.getClass().getName());
+                }
+                throw result;
+            }
+        });
+    }
+
+    /**
+     * Defines the cleanup logic to use for this permutation.
+     * Called regardless of errors in Setup and Verification, so be sure to handle those cases.
+     * <br><br>
+     * Any problems with cleanup should throw a {@link testmd.logic.CleanupException}
+     */
+    public Permutation cleanup(Runnable cleanup) {
         this.cleanup = cleanup;
         return this;
     }
 
     /**
      * Runs this permutation test. This method returns null because it should be called after all setup, cleanup, addParameter, etc. methods.
+     * <br><br>
+     * Logic is called only if (previous test results are not defined OR previous results are not verified OR permutation results changed) AND setup returned SetupResult.OK.
+     * <br><br>
+     * Within your verification logic:
+     * <ul>
+     * <li>If all tests pass successfully, no exceptions should be thrown</li>
+     * <li>Any assertions in the logic will throw an AssertionException which will be reported correctly as a failed test</li>
+     * <li>If it turns out that you cannot verify this permutation, throw {@link testmd.logic.CannotVerifyException}</li>
+     * <li>Any other exceptions thrown will be reported as a test exception</li>
+     * </ul>
+     *
      */
-    public void run(Verification verification) throws Exception {
+    public void run(Runnable verification) throws Exception {
         assert testManager != null : "No TestManager set";
 
         PermutationResult previousResult = testManager.getPreviousResult(this);
@@ -204,9 +243,9 @@ public class Permutation {
     }
 
     /**
-     * The actual test logic called by {@link #run(testmd.logic.Verification)} after previous run has been found.
+     * The actual test logic called by {@link #run(Runnable)} after previous run has been found.
      */
-    protected PermutationResult run(Verification verification, PermutationResult previousRun) throws Exception, AssertionError {
+    protected PermutationResult run(Runnable verification, PermutationResult previousRun) throws Exception, AssertionError {
         if (verification == null) {
             throw new RuntimeException("No verification logic set");
         }

@@ -1,7 +1,7 @@
 package testmd.logic;
 
 /**
- * Base class for all results of {@link testmd.logic.Setup#run()}.
+ * Base class for all results of {@link testmd.Permutation#setup(Runnable)}.
  * Actual exceptions thrown must be subclasses {@link testmd.logic.SetupResult.Skip} or {@link testmd.logic.SetupResult.CannotVerify} or the {@link #OK} static value.
  * <br><br>
  * Needed to be implemented as an exception to fit into the {@link java.lang.Runnable} interface for easier Spock testing.

@@ -3,7 +3,6 @@ package com.example
 import spock.lang.Specification
 import spock.lang.Unroll
 import testmd.TestMD
-import testmd.logic.Verification
 
 class ExampleSpockTest extends Specification {
 
@@ -19,7 +18,7 @@ class ExampleSpockTest extends Specification {
                 .run({
             executeSql(sql)
             assertDataInserted(tableName, columns, values)
-        } as Verification)
+        })
 
         where:
         tableName | columns                                      | values
@@ -42,7 +41,7 @@ class ExampleSpockTest extends Specification {
                 .run({
             executeSql(sql)
             assertDataInserted(tableName, columns, values)
-        } as Verification)
+        })
 
         where:
         tableName | columns                                      | values
@@ -63,7 +62,7 @@ class ExampleSpockTest extends Specification {
         TestMD.test(this.class, "query API").permutation([keywords: keywords, version: version])
                 .asTable("keywords", "version")
                 .addResult("query", query)
-                .run({ assertQueryResults(query, keywords) } as Verification)
+                .run({ assertQueryResults(query, keywords) })
 
         where:
         keywords             | version

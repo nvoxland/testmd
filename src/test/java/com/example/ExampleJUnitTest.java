@@ -27,7 +27,7 @@ public class ExampleJUnitTest {
                 .addParameter("columns", columns)
                 .addParameter("values", values)
                 .addResult("sql", sql)
-                .setup(new Setup() {
+                .setup(new Runnable() {
                     @Override
                     public void run() throws SetupResult {
                         openConnection();
@@ -37,12 +37,12 @@ public class ExampleJUnitTest {
                         resetDatabase();
                         throw SetupResult.OK;
                     }
-                }).cleanup(new Cleanup() {
+                }).cleanup(new Runnable() {
                     @Override
-                    public void run() throws CleanupException {
+                    public void run() {
                         closeConnection();
                     }
-        }).run(new Verification() {
+        }).run(new Runnable() {
             @Override
             public void run() throws CannotVerifyException, AssertionError {
                 executeSql(sql);
@@ -74,7 +74,7 @@ public class ExampleJUnitTest {
                     .addParameter("columns", columns)
                     .addParameter("values", values)
                     .addResult("sql", sql)
-                    .run(new Verification() {
+                    .run(new Runnable() {
                         @Override
                         public void run() {
                             executeSql(sql);
@@ -107,7 +107,7 @@ public class ExampleJUnitTest {
                     .addParameter("values", values)
                     .asTable("columns", "values")
                     .addResult("sql", sql)
-                    .run(new Verification() {
+                    .run(new Runnable() {
                         @Override
                         public void run() {
                             executeSql(sql);
@@ -137,7 +137,7 @@ public class ExampleJUnitTest {
                     .addParameter("version", version)
                     .asTable("keywords", "version")
                     .addResult("query", query)
-                    .run(new Verification() {
+                    .run(new Runnable() {
                         @Override
                         public void run() {
                             assertQueryResults(query, keywords);
