@@ -117,7 +117,10 @@ public class ResultsReader {
                     } else {
                         currentDetails.verified = false;
                         String[] split = verifiedData.split(": ", 2);
-                        assert split[0].equals("_NOT VERIFIED") : "Did not expect "+split[0];
+                        if (!split[0].equals("_NOT VERIFIED")) {
+                            throw new RuntimeException("Did not expect "+split[0]);
+                        }
+
                         if (split.length == 2) {
                             currentDetails.notRanMessage = split[1].replaceFirst("_$","");
                         }

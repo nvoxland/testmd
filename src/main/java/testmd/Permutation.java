@@ -207,7 +207,9 @@ public class Permutation {
      *
      */
     public void run(Runnable verification) throws Exception {
-        assert testManager != null : "No TestManager set";
+        if (testManager == null) {
+            throw new RuntimeException("No TestManager set");
+        }
 
         PermutationResult previousResult = testManager.getPreviousResult(this);
         PermutationResult result = run(verification, previousResult);
@@ -296,7 +298,9 @@ public class Permutation {
                     result = setupResultThrown;
                 }
 
-                assert result != null : "No result returned (thrown) by setup";
+                if (result == null) {
+                    throw new RuntimeException("No result returned (thrown) by setup");
+                }
 
                 if (!result.isValid()) {
                     log.debug("Test permutation setup is not valid");
