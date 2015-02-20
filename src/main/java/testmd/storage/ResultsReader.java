@@ -1,7 +1,7 @@
 package testmd.storage;
 
 import testmd.PermutationResult;
-import testmd.OldTestRun;
+import testmd.PreviousResults;
 import testmd.util.StringUtils;
 
 import java.io.BufferedReader;
@@ -22,10 +22,10 @@ public class ResultsReader {
         DATA
     }
 
-    public List<OldTestRun> read(String testClass, Reader reader) throws IOException {
+    public List<PreviousResults> read(String testClass, Reader reader) throws IOException {
 
-        List<OldTestRun> returnList = new ArrayList<>();
-        OldTestRun test = null;
+        List<PreviousResults> returnList = new ArrayList<>();
+        PreviousResults previousResults = null;
 
         Pattern testStartPattern = Pattern.compile("# Test: \"(.*)\" #");
         Pattern permutationStartPattern = Pattern.compile("## Permutation (\\S*) (.*) ##");
@@ -56,8 +56,8 @@ public class ResultsReader {
 
             Matcher headerMatcher = testStartPattern.matcher(line);
             if (headerMatcher.matches()) {
-                if (test != null) {
-                    saveLastPermutation(currentPermutationDetails, test, tableColumns);
+                if (previousResults != null) {
+                    saveLastPermutation(currentPermutationDetails, previousResults, tableColumns);
                 }
 
                 currentPermutationDetails = new CurrentPermutationDetails();
@@ -65,8 +65,8 @@ public class ResultsReader {
                 section = Section.DEFINITION;
                 tableColumns = new HashSet<>();
 
-                test = new OldTestRun(testClass, headerMatcher.group(1));
-                returnList.add(test);
+                previousResults = new PreviousResults(testClass, headerMatcher.group(1));
+                returnList.add(previousResults);
                 continue;
             }
 
@@ -109,7 +109,7 @@ public class ResultsReader {
 
             Matcher matcher = permutationStartPattern.matcher(line);
             if (matcher.matches()) {
-                saveLastPermutation(currentPermutationDetails, test, tableColumns);
+                saveLastPermutation(currentPermutationDetails, previousResults, tableColumns);
                 currentPermutationDetails = new CurrentPermutationDetails();
                 commonDetails = new HashMap<>();
                 section = Section.DEFINITION;
@@ -133,7 +133,7 @@ public class ResultsReader {
             }
 
             if (permutationSeparatorPattern.matcher(line).matches()) {
-                saveLastPermutation(currentPermutationDetails, test, tableColumns);
+                saveLastPermutation(currentPermutationDetails, previousResults, tableColumns);
                 currentPermutationDetails = new CurrentPermutationDetails();
                 commonDetails = new HashMap<>();
                 section = Section.DEFINITION;
@@ -191,7 +191,7 @@ public class ResultsReader {
                         System.out.println("");
                     } else {
                         if (!firstTableRow) {
-                            saveLastPermutation(currentPermutationDetails, test, tableColumns);
+                            saveLastPermutation(currentPermutationDetails, previousResults, tableColumns);
                             currentPermutationDetails = new CurrentPermutationDetails();
                         }
 
@@ -239,12 +239,12 @@ public class ResultsReader {
                 throw new RuntimeException("Could not parse line " + lineNumber + ": " + line);
             }
         }
-        saveLastPermutation(currentPermutationDetails, test, tableColumns);
+        saveLastPermutation(currentPermutationDetails, previousResults, tableColumns);
 
         return returnList;
     }
 
-    private void saveLastPermutation(CurrentPermutationDetails currentPermutationDetails, OldTestRun testRun, Set<String> tableColumns) {
+    private void saveLastPermutation(CurrentPermutationDetails currentPermutationDetails, PreviousResults testRun, Set<String> tableColumns) {
         if (currentPermutationDetails == null || currentPermutationDetails.verified == null) {
             return;
         }

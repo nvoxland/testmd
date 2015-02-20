@@ -18,11 +18,11 @@
 
 # Test: "insertingDataFormattedAsTable" #
 
-- **table:** address
+- **table:** person
 
-| Permutation | Verified | columns                  | values                   | RESULTS
-| :---------- | :------- | :----------------------- | :----------------------- | :------
-| 8ca304      | true     | address1, address2, city | 121 Main, null, New Town | **sql**: INSERT INTO address (address1, address2, city) VALUES ('121 Main', NULL, 'New Town');
+| Permutation | Verified | columns | values | RESULTS
+| :---------- | :------- | :------ | :----- | :------
+| acf3c1      | true     | age     | 42     | **sql**: INSERT INTO person (age) VALUES (42);
 
 # Test: "insertingData_simple" #
 

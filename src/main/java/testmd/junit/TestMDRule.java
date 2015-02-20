@@ -11,19 +11,21 @@ public class TestMDRule extends TestWatcher {
 
     private String testClassName;
     private String testName;
+    private Class<?> inSameRootAs;
 
     @Override
     protected void starting(Description description) {
-        testClassName = description.getTestClass().getName();
+        inSameRootAs = description.getTestClass();
+        testClassName = inSameRootAs.getName();
         testName = description.getMethodName();
 
     }
 
     public Permutation permutation(Map<String, Object> parameters) throws Exception {
-        return TestMD.test(testClassName, testName).permutation(parameters);
+        return TestMD.test(testClassName, testName, inSameRootAs).permutation(parameters);
     }
 
     public Permutation permutation() throws Exception {
-        return TestMD.test(testClassName, testName).permutation();
+        return TestMD.test(testClassName, testName, inSameRootAs).permutation();
     }
 }

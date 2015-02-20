@@ -3,13 +3,14 @@ package testmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import testmd.logic.*;
+import testmd.storage.TestManager;
 import testmd.util.StringUtils;
 
 import java.util.*;
 
 /**
  * Defines a test permutation to execute.
- * New permutation objects created through {@link TestMD#permutation()} or {@link TestMD#permutation(java.util.Map)} ) to ensure that they are property managed for saving results.
+ * New permutation objects are created through {@link testmd.TestBuilder#permutation()} or {@link testmd.TestBuilder#permutation(java.util.Map)} ) to ensure that they are property managed for saving results.
  * <br><br>
  * The lifecycle of a permutation is to call:
  * <ol>
@@ -25,6 +26,8 @@ import java.util.*;
  */
 public class Permutation {
 
+    private String testName;
+
     private Map<String, Value> parameters = new HashMap<String, Value>();
     private Set<String> tableParameters = new HashSet<String>();
     private Map<String, Value> results = new HashMap<String, Value>();
@@ -33,11 +36,13 @@ public class Permutation {
     private Runnable setup;
     private Runnable cleanup;
 
-    private NewTestRun testRun;
+    private TestManager testManager;
 
     private boolean forceRun = false;
+    private PermutationResult testResult;
 
-    protected Permutation(Map<String, Object> parameters) {
+    protected Permutation(String testName, Map<String, Object> parameters) {
+        this.testName = testName;
         if (parameters != null) {
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
                 if (entry.getValue() != null) {
@@ -47,8 +52,8 @@ public class Permutation {
         }
     }
 
-    protected void setTestRun(NewTestRun testRun) {
-        this.testRun = testRun;
+    public void setTestManager(TestManager testManager) {
+        this.testManager = testManager;
     }
 
     public Permutation forceRun() {
@@ -233,14 +238,13 @@ public class Permutation {
      * </ul>
      */
     public void run(Runnable verification) throws Exception {
-        if (testRun == null) {
+        if (testManager == null) {
             throw new RuntimeException("No TestManager set");
         }
 
-        PermutationResult previousResult = testRun.getPreviousResult(this);
+        PermutationResult previousResult = testManager.getPreviousResult(testName, this);
         try {
-            PermutationResult result = run(verification, previousResult);
-            testRun.addResult(result);
+            this.setTestResult(run(verification, previousResult));
         } catch (Throwable e) {
             String message = "Exception running permutation: " + e.getMessage() + "\n";
             if (e instanceof AssertionError) {
@@ -250,7 +254,7 @@ public class Permutation {
 
             LoggerFactory.getLogger(getClass()).error(message);
 
-            testRun.addResult(new PermutationResult.Failed());
+            setTestResult(new PermutationResult.Failed());
             throw new Exception(e);
         }
     }
@@ -408,4 +412,11 @@ public class Permutation {
     }
 
 
+    public PermutationResult getTestResult() {
+        return testResult;
+    }
+
+    protected void setTestResult(PermutationResult result) {
+        this.testResult = result;
+    }
 }

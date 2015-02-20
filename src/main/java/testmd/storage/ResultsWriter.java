@@ -2,7 +2,7 @@ package testmd.storage;
 
 import org.slf4j.LoggerFactory;
 import testmd.PermutationResult;
-import testmd.TestRun;
+import testmd.PreviousResults;
 import testmd.util.StringUtils;
 
 import java.io.File;
@@ -19,7 +19,15 @@ public class ResultsWriter {
     public static final String SEPARATOR = "---------------------------------------";
     boolean wroteWarning = false;
 
-    public void write(File file, SortedSet<TestRun> services) {
+    public void write(File file, Collection<PreviousResults> results) {
+
+        SortedSet<PreviousResults> sortedResults = new TreeSet<>(new Comparator<PreviousResults>() {
+            @Override
+            public int compare(PreviousResults o1, PreviousResults o2) {
+                return o1.getTestName().compareTo(o2.getTestName());
+            }
+        });
+        sortedResults.addAll(results);
 
         try {
             file.getParentFile().mkdirs();
@@ -29,7 +37,7 @@ public class ResultsWriter {
 
 
             try (FileWriter fileWriter = new FileWriter(file)) {
-                for (TestRun service : services) {
+                for (PreviousResults service : results) {
                     resultsWriter.write(service.getTestClass(), service.getTestName(), service.getResults(), fileWriter);
                 }
             }

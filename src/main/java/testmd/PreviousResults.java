@@ -1,17 +1,15 @@
 package testmd;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-public abstract class TestRun {
+public class PreviousResults {
 
     private final String testClass;
     private final String testName;
 
-    private List<PermutationResult> results = new ArrayList<>();
+    private Map<String, PermutationResult> results = new HashMap<>();
 
-    public TestRun(String testClass, String testName) {
+    public PreviousResults(String testClass, String testName) {
         this.testClass = testClass;
         this.testName = testName;
     }
@@ -25,10 +23,14 @@ public abstract class TestRun {
     }
 
     public void addResult(PermutationResult result) {
-        this.results.add(result);
+        this.results.put(result.getKey(), result);
     }
 
     public List<PermutationResult> getResults() {
-        return Collections.unmodifiableList(results);
+        return Collections.unmodifiableList(new ArrayList<>(results.values()));
+    }
+
+    public PermutationResult getResult(String key) {
+        return null;
     }
 }

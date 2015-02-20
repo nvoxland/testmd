@@ -2,10 +2,7 @@ package testmd.storage
 
 import spock.lang.Specification
 import spock.lang.Unroll
-import testmd.OldTestRun
-import testmd.PermutationResult
-import testmd.storage.ResultsReader
-import testmd.storage.ResultsWriter
+import testmd.PreviousResults
 import testmd.util.StringUtils
 
 import static org.junit.Assert.fail
@@ -58,7 +55,7 @@ class ResultsReaderTest extends Specification {
         "multiple_tests_tables.md" | ["complex test with tables", "complex test with tables: part 2", "can snapshot all tables in catalog", "can snapshot all tables in schema"]
     }
 
-    def assertResultsSame(String expectedFile, List<OldTestRun> actualResults, String testClass, List<String> testName) {
+    def assertResultsSame(String expectedFile, List<PreviousResults> actualResults, String testClass, List<String> testName) {
         def writer = new ResultsWriter()
         def actualString = new StringWriter()
 

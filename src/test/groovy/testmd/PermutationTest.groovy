@@ -18,7 +18,7 @@ class PermutationTest extends Specification {
         executeRunCount = 0
         cleanupRunCount = 0
 
-        permutation = new Permutation([a: 1, b: 2])
+        permutation = new Permutation("Test Name", [a: 1, b: 2])
                 .addResult("out", 100)
                 .setup({setupRunCount++; throw SetupResult.OK})
                 .cleanup({ cleanupRunCount++ })
@@ -26,7 +26,7 @@ class PermutationTest extends Specification {
 
     def "constructor with null parameters"() {
         expect:
-        new Permutation(null).getParameters().size() == 0
+        new Permutation("Test Name", null).getParameters().size() == 0
     }
 
     def "run with no previous result"() {

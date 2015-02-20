@@ -14,7 +14,7 @@ class PermutationResultTest extends Specification {
             }
         }
 
-        def permutation = new Permutation(["b": 1, "a": 2])
+        def permutation = new Permutation("Test Name", ["b": 1, "a": 2])
         permutation.addResult("dataX", "x")
         permutation.addResult("data5", 5)
         permutation.addResult("dataCustom", "replace", format)
