@@ -40,6 +40,7 @@ public class Permutation {
 
     private boolean forceRun = false;
     private PermutationResult testResult;
+    private boolean wasRan = false;
 
     protected Permutation(String testName, Map<String, Object> parameters) {
         this.testName = testName;
@@ -272,7 +273,7 @@ public class Permutation {
 
     @Override
     public String toString() {
-        return "Test Permutation [" + StringUtils.join(getParameters(), ", ", StringUtils.STANDARD_STRING_FORMAT, false) + "]";
+        return "Test \""+testName+"\", Permutation [" + StringUtils.join(getParameters(), ", ", StringUtils.STANDARD_STRING_FORMAT, false) + "]";
     }
 
     /**
@@ -300,7 +301,7 @@ public class Permutation {
         }
 
         Logger log = LoggerFactory.getLogger(Permutation.class);
-        log.debug("----- Running Test Permutation" + this.toString() + " -----");
+        log.debug("----- Running " + this.toString() + " -----");
 
         if (!forceRun && previousRun != null) {
             if (previousRun.isVerified()) {
@@ -335,6 +336,7 @@ public class Permutation {
 
         try {
             log.info("Test permutation is being (re)tested");
+            wasRan = true;
             if (setup != null) {
                 log.debug("Executing test permutation setup");
 
@@ -418,5 +420,9 @@ public class Permutation {
 
     protected void setTestResult(PermutationResult result) {
         this.testResult = result;
+    }
+
+    public boolean wasRan() {
+        return wasRan;
     }
 }

@@ -31,6 +31,6 @@ public class PreviousResults {
     }
 
     public PermutationResult getResult(String key) {
-        return null;
+        return results.get(key);
     }
 }

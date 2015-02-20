@@ -1,5 +1,6 @@
 package testmd.storage;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import testmd.*;
 
@@ -88,12 +89,14 @@ public class TestManager {
     protected void writeResults() {
         SortedMap<String, PreviousResults> finalResults = new TreeMap<>();
 
+        Logger log = LoggerFactory.getLogger(getClass());
         if (permutations.size() == 0) {
-            LoggerFactory.getLogger(getClass()).debug("No permutations to save for  " + testGroup);
+            log.debug("No permutations to save for  " + testGroup);
             return;
         }
 
         boolean canSave = true;
+        boolean somethingRan = false;
         for (Map.Entry<String, List<Permutation>> entry : permutations.entrySet()) {
             if (!canSave) {
                 break;
@@ -105,6 +108,9 @@ public class TestManager {
                 if (!canSave) {
                     break;
                 }
+                if (permutation.wasRan()) {
+                    somethingRan = true;
+                }
 
                 PermutationResult result = permutation.getTestResult();
                 if (result.isSavable()) {
@@ -115,11 +121,16 @@ public class TestManager {
                     }
                     results.addResult(result);
                 } else {
-                    LoggerFactory.getLogger(getClass()).debug("Not saving " + testGroup);
+                    log.debug("Not saving " + testGroup);
                     canSave = false;
                     break;
                 }
             }
+        }
+
+        if (!somethingRan) {
+            log.debug("No permutations executed for "+testGroup+", do not write results");
+            return;
         }
 
         if (canSave) {
@@ -131,8 +142,7 @@ public class TestManager {
                 }
             }
 
-            File file = getFile();
-            resultsWriter.write(file, finalResults.values());
+            resultsWriter.write(getFile(), finalResults.values());
         }
     }
 
