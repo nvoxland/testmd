@@ -33,7 +33,9 @@ public class Permutation {
     private Runnable setup;
     private Runnable cleanup;
 
-    private TestMD testManager;
+    private NewTestRun testRun;
+
+    private boolean forceRun = false;
 
     protected Permutation(Map<String, Object> parameters) {
         if (parameters != null) {
@@ -45,8 +47,13 @@ public class Permutation {
         }
     }
 
-    protected void setTestManager(TestMD testManager) {
-        this.testManager = testManager;
+    protected void setTestRun(NewTestRun testRun) {
+        this.testRun = testRun;
+    }
+
+    public Permutation forceRun() {
+        this.forceRun = true;
+        return this;
     }
 
     /**
@@ -97,6 +104,26 @@ public class Permutation {
     public Permutation asTable(Collection<String> tableParameters) {
         if (tableParameters != null) {
             this.tableParameters.addAll(tableParameters);
+        }
+        return this;
+    }
+
+    /**
+     * Convenience method instead of calling {@link #addParameter(String, Object)} then {@link #asTable(java.util.Collection)}
+     */
+    public Permutation asTable(Map<String, Object> parameters) {
+        return asTable(parameters, ValueFormat.DEFAULT);
+    }
+
+    /**
+     * Convenience method instead of calling {@link #addParameter(String, Object, ValueFormat)} then {@link #asTable(java.util.Collection)}
+     */
+    public Permutation asTable(Map<String, Object> parameters, ValueFormat valueFormat) {
+        if (parameters != null) {
+            for (Map.Entry<String, Object> param : parameters.entrySet()) {
+                addParameter(param.getKey(), param.getValue(), valueFormat);
+            }
+            this.tableParameters.addAll(parameters.keySet());
         }
         return this;
     }
@@ -174,7 +201,7 @@ public class Permutation {
             public void run() {
                 SetupResult result = setup.run();
                 if (result == null) {
-                    throw new SetupResult.CannotVerify("No SetupResult returned from testmd.logic.Setup implementation "+setup.getClass().getName());
+                    throw new SetupResult.CannotVerify("No SetupResult returned from testmd.logic.Setup implementation " + setup.getClass().getName());
                 }
                 throw result;
             }
@@ -204,16 +231,28 @@ public class Permutation {
      * <li>If it turns out that you cannot verify this permutation, throw {@link testmd.logic.CannotVerifyException}</li>
      * <li>Any other exceptions thrown will be reported as a test exception</li>
      * </ul>
-     *
      */
     public void run(Runnable verification) throws Exception {
-        if (testManager == null) {
+        if (testRun == null) {
             throw new RuntimeException("No TestManager set");
         }
 
-        PermutationResult previousResult = testManager.getPreviousResult(this);
-        PermutationResult result = run(verification, previousResult);
-        testManager.addNewResult(result);
+        PermutationResult previousResult = testRun.getPreviousResult(this);
+        try {
+            PermutationResult result = run(verification, previousResult);
+            testRun.addResult(result);
+        } catch (Throwable e) {
+            String message = "Exception running permutation: " + e.getMessage() + "\n";
+            if (e instanceof AssertionError) {
+                message = "Failure running permutation: " + e.getMessage() + "\n";
+            }
+            message += toLongString(4);
+
+            LoggerFactory.getLogger(getClass()).error(message);
+
+            testRun.addResult(new PermutationResult.Failed());
+            throw new Exception(e);
+        }
     }
 
     /**
@@ -259,7 +298,7 @@ public class Permutation {
         Logger log = LoggerFactory.getLogger(Permutation.class);
         log.debug("----- Running Test Permutation" + this.toString() + " -----");
 
-        if (previousRun != null) {
+        if (!forceRun && previousRun != null) {
             if (previousRun.isVerified()) {
                 log.debug("Previous test permutation run was verified");
                 boolean allEqual = true;
@@ -280,14 +319,18 @@ public class Permutation {
                     log.debug("This test permutation is unchanged since the verified permutation. Do not run again");
 
                     return new PermutationResult.Verified(this);
+                } else {
+                    log.debug("This test permutation changed since the verified permutation. Will test again");
                 }
             } else {
                 log.debug("Previous test permutation run was NOT verified");
             }
+        } else if (forceRun) {
+            log.warn("FORCE RUN TEST");
         }
 
         try {
-            log.debug("Test permutation is being (re)tested");
+            log.info("Test permutation is being (re)tested");
             if (setup != null) {
                 log.debug("Executing test permutation setup");
 
@@ -303,18 +346,15 @@ public class Permutation {
                 }
 
                 if (!result.isValid()) {
-                    log.debug("Test permutation setup is not valid");
+                    log.warn("Test permutation setup is not valid: " + result.getMessage() + "\n" + toLongString(4));
                     return new PermutationResult.Invalid(result.getMessage(), this);
                 } else if (!result.canVerify()) {
-                    log.debug("Cannot verify: " + result.getMessage());
+                    log.warn("Cannot verify: " + result.getMessage() + "\n" + toLongString(4));
                     return new PermutationResult.Unverified(result.getMessage(), this);
                 }
             }
         } catch (Throwable e) {
-            String message = "Error executing setup\n" +
-                    "Description: " + toString(parameters) + "\n" +
-                    "Notes: " + toString(notes) + "\n" +
-                    "Results: " + toString(results);
+            String message = "Error executing setup\n" + toLongString(4);
 
             try {
                 if (cleanup != null) {
@@ -358,6 +398,13 @@ public class Permutation {
         }
 
         return new PermutationResult.Verified(this);
+    }
+
+    protected String toLongString(int indent) {
+        return StringUtils.indent(
+                (parameters.size() > 0 ? "Description: " + toString(parameters) + "\n" : "") +
+                        (notes.size() > 0 ? "Notes: " + toString(notes) + "\n" : "") +
+                        (results.size() > 0 ? "Results: " + toString(results) : ""), indent);
     }
 
 

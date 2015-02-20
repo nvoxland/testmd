@@ -1,16 +1,16 @@
 package testmd;
 
+import junit.framework.TestResult;
+import org.slf4j.LoggerFactory;
 import testmd.storage.ResultsReader;
 import testmd.storage.ResultsWriter;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Entry point class to create a new TestMD test. Primary method to define the test is {@link #test(String, String)}. When running in JUnit, consider using {@link testmd.junit.TestMDRule}
@@ -22,14 +22,10 @@ import java.util.Map;
  * This class will ensure that files are only read and written once and so it follows a singleton pattern.
  */
 public class TestMD {
-    private static final Map<String, TestMD> instances = new HashMap<String, TestMD>();
+    private static final Map<File, Map<String, NewTestRun>> newTestRuns = new HashMap<>();
+    private static final Map<File, Map<String, OldTestRun>> oldTestRuns = new HashMap<>();
     private static ResultsManager resultsManager = new ResultsManager();
 
-    private final String testClass;
-    private final String testName;
-    private Map<String, PermutationResult> previousResults;
-    private List<PermutationResult> newResults = new ArrayList<PermutationResult>();
-    private List<Permutation> permutations = new ArrayList<Permutation>();
     private static String baseDirectory;
 
     static {
@@ -49,32 +45,76 @@ public class TestMD {
         TestMD.baseDirectory = baseDirectory;
     }
 
+    public static NewTestRun test(Class testClass, String testName) {
+        return test(testClass.getName(), testName);
+    }
+
     /**
      * Convenience method for {@link #test(String, String)} for defining a test with a Class.
      */
-    public static TestMD test(Class testClass, String testName) {
-        return test(testClass.getName(), testName);
+    public static NewTestRun test(Class testClass, String testName, Class isSameClassRoot) {
+        return test(testClass.getName(), testName, isSameClassRoot);
+    }
+
+    public static NewTestRun test(String testClass, String testName) {
+        try {
+            return test(testClass, testName, Class.forName(testClass));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**
      * Looks up or creates the TestMD manager for the given testClass and testName combination.
      */
-    public static TestMD test(String testClass, String testName) {
-        String key = testClass + ":" + testName;
-        if (!instances.containsKey(key)) {
-            TestMD service = new TestMD(testClass, testName);
-            instances.put(key, service);
+    public static NewTestRun test(String testClass, String testName, Class inSameClassRoot) {
 
-            if (resultsManager != null) {
-                resultsManager.scheduleWriteResults(service);
+        File file = new TestMD().getFile(testClass, testName, inSameClassRoot);
+        String testKey = testClass + ":" + testName;
+
+        try {
+            if (!oldTestRuns.containsKey(file)) {
+                HashMap<String, OldTestRun> map = new HashMap<>();
+                oldTestRuns.put(file, map);
+                if (file.exists()) {
+                    LoggerFactory.getLogger(TestMD.class).debug("Found previous run stored at " + file.getAbsolutePath());
+
+                    FileReader reader = new FileReader(file);
+                    for (OldTestRun oldTestRun : new ResultsReader().read(testClass, reader)) {
+                        map.put(testKey, oldTestRun);
+                    }
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading previous results", e);
         }
-        return instances.get(key);
+
+//        if (newTestRuns.containsKey(file)) {
+//            throw new RuntimeException("Already defined a test "+testName+" in "+testClass);
+//        }
+
+        NewTestRun newTestRun = new NewTestRun(testClass, testName, oldTestRuns.get(file).get(testKey));
+
+        Map<String, NewTestRun> newTestRunMap = newTestRuns.get(file);
+        if (newTestRunMap == null) {
+            newTestRunMap = new HashMap<>();
+            newTestRuns.put(file, newTestRunMap);
+        }
+        newTestRunMap.put(testKey, newTestRun);
+
+        if (resultsManager != null) {
+            resultsManager.scheduleWriteResults(file);
+        }
+
+
+        return newTestRun;
     }
 
-    private TestMD(String testClass, String testName) {
-        this.testClass = testClass;
-        this.testName = testName;
+    protected File getFile(String testClass, String testName, Class inSameClassRoot) {
+        String testPackageDir = testClass.replaceFirst("\\.[^\\.]*$", "").replace(".", "/");
+        String fileName = testClass.replaceFirst(".*\\.", "") + ".accepted.md";
+
+        return new File(new File(getBaseDirectory(inSameClassRoot), testPackageDir), fileName);
     }
 
     /**
@@ -85,75 +125,18 @@ public class TestMD {
         TestMD.resultsManager = resultManager;
     }
 
-    /**
-     * Creates and configures a new permutation with no parameters.
-     */
-    public Permutation permutation() throws Exception {
-        return permutation(null);
-    }
-
-    /**
-     * Creates and configures a new permutation which is populated with the map values as parameters.
-     */
-    public Permutation permutation(Map<String, Object> parameters) throws Exception {
-        Permutation permutation = new Permutation(parameters);
-        permutation.setTestManager(this);
-
-        permutations.add(permutation);
-
-        return permutation;
-    }
-
-    protected PermutationResult getPreviousResult(Permutation permutation) throws Exception {
-        if (previousResults == null) {
-            previousResults = new HashMap<String, PermutationResult>();
-
-            File file = getFile();
-            if (file.exists()) {
-                FileReader reader = new FileReader(file);
-                for (PermutationResult previousResult : new ResultsReader().read(reader)) {
-                    previousResults.put(previousResult.getKey(), previousResult);
-                }
-            }
-        }
-        return previousResults.get(permutation.getKey());
-    }
-
-    protected void addNewResult(PermutationResult result) {
-        newResults.add(result);
-    }
-
-    protected String getTestClass() {
-        return testClass;
-    }
-
-    protected String getTestName() {
-        return testName;
-    }
-
-    protected File getFile() {
-        String testPackageDir = getTestClass().replaceFirst("\\.[^\\.]*$", "").replace(".", "/");
-        String fileName = getTestClass().replaceFirst(".*\\.", "") + "." + escapeFileName(getTestName()) + ".accepted.md";
-
-        return new File(new File(getBaseDirectory(), testPackageDir), fileName);
-    }
-
-    protected String escapeFileName(String name) {
-        return name.replaceAll("\\s+", "_").replaceAll("[\\-\\.]", "");
-    }
-
-    protected File getBaseDirectory() {
-        String testClassName = testClass.replace(".", "/") + ".class";
+    protected File getBaseDirectory(Class inSameClassRoot) {
+        String testClassName = inSameClassRoot.getName().replace(".", "/") + ".class";
 
         URL resource = this.getClass().getClassLoader().getResource(testClassName);
         if (resource == null) {
             return new File(".").getAbsoluteFile();
         }
 
-        int packageLevels = testClass.replaceAll("[^\\.]", "").length();
+        int packageLevels = testClassName.replaceAll("[^/]", "").length();
 
         File classRoot = new File(resource.getFile()).getParentFile();
-        for (int i=0; i<packageLevels; i++) {
+        for (int i = 0; i < packageLevels; i++) {
             classRoot = classRoot.getParentFile();
         }
 
@@ -166,40 +149,62 @@ public class TestMD {
      */
     public static class ResultsManager {
 
-        protected void scheduleWriteResults(final TestMD service) {
-            Runnable shutdownHook = new Runnable() {
-                @Override
-                public void run() {
-                    writeResults(service);
-                }
-            };
-            Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+        private Set<File> files = new HashSet<>();
+
+        protected void scheduleWriteResults(final File file) {
+            if (files.add(file)) {
+                Runnable shutdownHook = new Runnable() {
+                    @Override
+                    public void run() {
+                        writeResults(file);
+                    }
+                };
+                Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+            }
         }
 
-        protected void writeResults(TestMD service) {
-            if (service.permutations.size() == 0) {
-                return;
-            }
+        protected void writeResults(File file) {
+            Map<String, TestRun> finalResults = new HashMap<>();
 
-            for (PermutationResult result : service.newResults) {
-                if (!result.isSavable()) {
-                    return;
+            boolean canSave = true;
+            for (NewTestRun newTestRun : newTestRuns.get(file).values()) {
+                if (!canSave) {
+                    break;
+                }
+                if (newTestRun.getPermutations().size() == 0) {
+                    LoggerFactory.getLogger(getClass()).debug("No permutations to save for  " + file.getAbsolutePath());
+                    continue;
+                }
+
+                for (PermutationResult result : newTestRun.getResults()) {
+                    if (!result.isSavable()) {
+                        LoggerFactory.getLogger(getClass()).debug("Cannot save results to " + file.getAbsolutePath());
+                        canSave = false;
+                        break;
+                    }
+                }
+
+                if (canSave) {
+                    finalResults.put(newTestRun.getTestName(), newTestRun);
                 }
             }
-            File file = service.getFile();
-            file.getParentFile().mkdirs();
 
-            try {
-                FileWriter fileWriter = new FileWriter(file);
-                try {
-                    new ResultsWriter().write(service.getTestClass(), service.getTestName(), service.newResults, fileWriter);
-                } finally {
-                    fileWriter.flush();
-                    fileWriter.close();
+            if (canSave) {
+                for (OldTestRun oldTestRun : oldTestRuns.get(file).values()) {
+                    if (!finalResults.containsKey(oldTestRun.getTestName())) {
+                        finalResults.put(oldTestRun.getTestName(), oldTestRun);
+                    }
                 }
-            } catch (Throwable e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
+
+                SortedSet<TestRun> toSave = new TreeSet<>(new Comparator<TestRun>() {
+                    @Override
+                    public int compare(TestRun o1, TestRun o2) {
+                        return o1.getTestName().compareTo(o2.getTestName());
+                    }
+                });
+                toSave.addAll(finalResults.values());
+
+                new ResultsWriter().write(file, toSave);
             }
         }
 

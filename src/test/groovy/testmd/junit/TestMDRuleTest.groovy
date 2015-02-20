@@ -16,8 +16,8 @@ class TestMDRuleTest extends Specification {
         def permutation = rule.permutation()
 
         then:
-        permutation.testManager.getTestClass() == "com.example.ExampleJUnitTest"
-        permutation.testManager.getTestName() == "Display Name"
+        permutation.testRun.getTestClass() == "com.example.ExampleJUnitTest"
+        permutation.testRun.getTestName() == "Display Name"
 
     }
 }

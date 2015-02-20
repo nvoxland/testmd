@@ -1,8 +1,12 @@
 package testmd.storage;
 
+import org.slf4j.LoggerFactory;
 import testmd.PermutationResult;
+import testmd.TestRun;
 import testmd.util.StringUtils;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
@@ -12,13 +16,39 @@ import java.util.*;
  */
 public class ResultsWriter {
 
-    private static final String SEPARATOR = "---------------------------------------";
+    public static final String SEPARATOR = "---------------------------------------";
+    boolean wroteWarning = false;
 
-    public void write(String testClass, String testName, Collection<PermutationResult> results, Writer out) throws IOException {
-        out.append("# Test: ").append(testClass).append(" \"").append(testName).append("\"");
-        out.append(" #\n\n");
+    public void write(File file, SortedSet<TestRun> services) {
 
-        out.append("NOTE: This output is generated and parsed by TestMD. Please read it, but DO NOT EDIT MANUALLY\n\n"+SEPARATOR+"\n\n");
+        try {
+            file.getParentFile().mkdirs();
+
+            LoggerFactory.getLogger(getClass()).debug("Writing results to " + file.getAbsolutePath());
+            ResultsWriter resultsWriter = new ResultsWriter();
+
+
+            try (FileWriter fileWriter = new FileWriter(file)) {
+                for (TestRun service : services) {
+                    resultsWriter.write(service.getTestClass(), service.getTestName(), service.getResults(), fileWriter);
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    protected void write(String testClass, String testName, Collection<PermutationResult> results, Writer out) throws IOException {
+        if (!wroteWarning) {
+            out.append("**NOTE: This output is generated and parsed by TestMD. Please read it, but DO NOT EDIT MANUALLY**\n");
+            wroteWarning = true;
+        }
+
+
+        out.append("\n# Test: \"").append(testName).append("\" #\n\n");
 
         if (results.size() == 0) {
             out.append("**NO PERMUTATIONS**\n");
@@ -45,7 +75,9 @@ public class ResultsWriter {
         List<PermutationResult> results = new ArrayList(passedResults);
         Collections.sort(results);
 
+        int i = 0;
         for (PermutationResult result : results) {
+            i++;
             if (!result.isValid()) {
                 continue;
             }
@@ -86,7 +118,9 @@ public class ResultsWriter {
                 }
             }
 
-            out.append("\n"+SEPARATOR+"\n\n");
+            if (i < results.size()) {
+                out.append("\n"+SEPARATOR+"\n\n");
+            }
         }
     }
 
@@ -108,7 +142,9 @@ public class ResultsWriter {
         }
 
         int testCount = 0;
+        int resultIndex = 0;
         for (Map.Entry<String, List<PermutationResult>> entry : resultsByTable.entrySet()) {
+            resultIndex++;
             List<PermutationResult> tableResults = new ArrayList<PermutationResult>();
             for (PermutationResult result : entry.getValue()) {
                 if (result.isValid()) {
@@ -124,9 +160,11 @@ public class ResultsWriter {
                 out.append(SEPARATOR + "\n\n");
             }
 
+            boolean hasParams = false;
             for (Map.Entry<String, String> descriptionEntry : tableResults.get(0).getParameters().entrySet()) {
                 if (!tableResults.get(0).getTableParameters().contains(descriptionEntry.getKey())) {
                     appendMapEntry(descriptionEntry, out);
+                    hasParams = true;
                 }
             }
 
@@ -165,7 +203,9 @@ public class ResultsWriter {
                 }
             }
 
-            out.append("\n");
+            if (hasParams) {
+                out.append("\n");
+            }
 
             String headerRow = "| "+StringUtils.pad("Permutation", permutationNameColLength)+" | "+StringUtils.pad("Verified", verifiedColLength)+" |";
             for (Map.Entry<String, Integer> columnEntry : maxColumnLengths.entrySet()) {
@@ -227,10 +267,10 @@ public class ResultsWriter {
                 permutationRows.put(rowKey, row.toString());
             }
             out.append(StringUtils.join(permutationRows.values(), "", StringUtils.STANDARD_STRING_FORMAT, false));
-            out.append("\n\n");
+            if (resultIndex < resultsByTable.size()) {
+                out.append("\n");
+            }
         }
-
-        out.append(SEPARATOR).append("\n\n");
     }
 
     private String clean(String string) {

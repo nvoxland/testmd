@@ -1,6 +1,6 @@
 **NOTE: This output is generated and parsed by TestMD. Please read it, but DO NOT EDIT MANUALLY**
 
-# Test: "complex test" #
+# Test: "multiple test" #
 
 ## Permutation 044ea5 (verified) ##
 
@@ -37,7 +37,7 @@
 - **String data:** I see data here
 - **int data:** 3838
 
----------------------------------------
+# Test: "multiple test: part 2" #
 
 ## Permutation 3c83d6 _NOT VERIFIED: Was too lazy_ ##
 

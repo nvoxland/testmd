@@ -1,7 +1,5 @@
-# Test: com.example.Test "my test name" #
+**NOTE: This output is generated and parsed by TestMD. Please read it, but DO NOT EDIT MANUALLY**
 
-NOTE: This output is generated and parsed by TestMD. Please read it, but DO NOT EDIT MANUALLY
-
----------------------------------------
+# Test: "my test name" #
 
 **NO PERMUTATIONS**

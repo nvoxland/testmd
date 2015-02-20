@@ -170,6 +170,5 @@ class ResultsWriterTest extends Specification {
                 .setResults(["String data": "No notes, just one data"]))
 
         return results
-
     }
 }

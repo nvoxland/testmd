@@ -2,6 +2,7 @@ package testmd.storage
 
 import spock.lang.Specification
 import spock.lang.Unroll
+import testmd.OldTestRun
 import testmd.PermutationResult
 import testmd.storage.ResultsReader
 import testmd.storage.ResultsWriter
@@ -14,10 +15,13 @@ class ResultsReaderTest extends Specification {
     def "read empty test"() {
         when:
         def reader = new InputStreamReader(openStream("empty.md"))
-        def results = new ResultsReader().read(reader)
+        def results = new ResultsReader().read("com.example.Test", reader)
 
         then:
-        assert results.size() == 0
+        assert results.size() == 1
+        assert results[0].getTestName() == "my test name"
+        assert results[0].getTestClass() == "com.example.Test"
+        assert results[0].getResults().size() == 0
 
         cleanup:
         reader && reader.close()
@@ -37,7 +41,7 @@ class ResultsReaderTest extends Specification {
     def "saved results can be read"() {
         when:
         def reader = new InputStreamReader(openStream(resultsFile))
-        def results = new ResultsReader().read(reader)
+        def results = new ResultsReader().read("com.example.Test", reader)
 
         then:
         assertResultsSame(resultsFile, results, "com.example.Test", testName)
@@ -47,16 +51,21 @@ class ResultsReaderTest extends Specification {
 
         where:
         resultsFile | testName
-        "empty.md" | "my test name"
-        "complex.md" | "complex test"
-        "complex_tables.md" | "complex test with tables"
+        "empty.md" | ["my test name"]
+        "complex.md" | ["complex test"]
+        "complex_tables.md" | ["complex test with tables"]
+        "multiple_tests.md" | ["multiple test", "multiple test: part 2"]
+        "multiple_tests_tables.md" | ["complex test with tables", "complex test with tables: part 2", "can snapshot all tables in catalog", "can snapshot all tables in schema"]
     }
 
-    def assertResultsSame(String expectedFile, List<PermutationResult> actualResults, String testClass, String testName) {
+    def assertResultsSame(String expectedFile, List<OldTestRun> actualResults, String testClass, List<String> testName) {
         def writer = new ResultsWriter()
         def actualString = new StringWriter()
 
-        writer.write(testClass, testName, actualResults, actualString)
+        def i = 0;
+        for (def testRun : actualResults) {
+            writer.write(testClass, testName[i++], testRun.getResults(), actualString)
+        }
 
         def expectedStream = openStream(expectedFile)
 
