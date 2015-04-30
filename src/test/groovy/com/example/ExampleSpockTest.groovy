@@ -13,8 +13,8 @@ class ExampleSpockTest extends Specification {
 
         //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
         def sql = logic.generateInsertSql(tableName, columns, values)
-        TestMD.test(this.class, "inserting data").permutation([table: tableName, columns: columns, values: values])
-                .addResult("sql", sql)
+        TestMD.test(this.class, "inserting data").withPermutation([table: tableName, columns: columns, values: values])
+                .addOperation("sql", sql)
                 .run({
             executeSql(sql)
             assertDataInserted(tableName, columns, values)
@@ -35,9 +35,9 @@ class ExampleSpockTest extends Specification {
 
         //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
         def sql = logic.generateInsertSql(tableName, columns, values)
-        TestMD.test(this.class, "inserting data formatted as a table").permutation([table: tableName, columns: columns, values: values])
-                .asTable("columns", "values")
-                .addResult("sql", sql)
+        TestMD.test(this.class, "inserting data formatted as a table").withPermutation([table: tableName, columns: columns, values: values])
+                .formattedAsTable("columns", "values")
+                .addOperation("sql", sql)
                 .run({
             executeSql(sql)
             assertDataInserted(tableName, columns, values)
@@ -59,9 +59,9 @@ class ExampleSpockTest extends Specification {
 
         //Using TestMD.test directly to avoid a separate accepted.md file for each permutation
         def query = logic.generateQueryRequest(version, keywords)
-        TestMD.test(this.class, "query API").permutation([keywords: keywords, version: version])
-                .asTable("keywords", "version")
-                .addResult("query", query)
+        TestMD.test(this.class, "query API").withPermutation([keywords: keywords, version: version])
+                .formattedAsTable("keywords", "version")
+                .addOperation("query", query)
                 .run({ assertQueryResults(query, keywords) })
 
         where:

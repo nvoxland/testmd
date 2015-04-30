@@ -35,7 +35,7 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
             parameters.put(entry.getKey(), entry.getValue().serialize());
         }
 
-        for (Map.Entry<String, Value> entry : permutation.getResults().entrySet()) {
+        for (Map.Entry<String, Value> entry : permutation.getOperations().entrySet()) {
             results.put(entry.getKey(), entry.getValue().serialize());
         }
 

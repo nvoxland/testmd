@@ -6,7 +6,7 @@
 - **Param 1:** param 1 is a
 - **Param 2:** param 2 is a
 
-| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | RESULTS
+| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
 | b44a96      | true     | tp1 is a      | tp2 is a      |               |                | **out data**: Permutation 1
 
@@ -16,7 +16,7 @@
 - **Param 1:** param 1 is d
 - **Param 2:** param 2 is d
 
-| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | RESULTS
+| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
 | 950940      | Too dark |               |               |               | tpx1 is a      | **out data**: Permutation 6
 | 1390e9      | false    |               |               |               | tpx1 is b      | **out data**: Permutation 7<br>With a second line with &#124; chars<br>And another with &#124; chars
@@ -27,7 +27,7 @@
 - **Param 1:** param 1 is b
 - **Param 2:** param 2 is b
 
-| Permutation | Verified         | table param 1 | table param 2 | table param 3 | table param x1 | RESULTS
+| Permutation | Verified         | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :--------------- | :------------ | :------------ | :------------ | :------------- | :------
 | e35a78      | false            |               | tp2 is b      |               |                | **out data**: Permutation 2
 | bc2594      | false            |               | tp2 is e      |               |                | **out data**: Permutation 5
@@ -44,7 +44,7 @@
     this on a second line
 - **String Parameter 1:** Short Parameter
 
-| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | RESULTS
+| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
 | 8fee93      | true     |               | tp2 is b      |               |                | **String data**: No notes, just one data
 
@@ -54,7 +54,7 @@
 - **Param 1:** param 1 is c
 - **Param 2:** param 2 is c
 
-| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | RESULTS
+| Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
 | 1cf80c      | true     | tp1 is c      | tp2 is c      | tp3 is c      |                | __more info__: Some notes for permutation 3
 |             |          |               |               |               |                | **out data**: Permutation 3

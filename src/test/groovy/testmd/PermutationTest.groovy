@@ -5,6 +5,9 @@ import spock.lang.Unroll
 import testmd.logic.CannotVerifyException
 import testmd.logic.SetupResult
 
+import static org.hamcrest.Matchers.containsInAnyOrder
+import static spock.util.matcher.HamcrestSupport.*
+
 
 class PermutationTest extends Specification {
 
@@ -19,7 +22,7 @@ class PermutationTest extends Specification {
         cleanupRunCount = 0
 
         permutation = new Permutation("Test Name", [a: 1, b: 2])
-                .addResult("out", 100)
+                .addOperation("out", 100)
                 .setup({setupRunCount++; throw SetupResult.OK})
                 .cleanup({ cleanupRunCount++ })
     }
@@ -200,5 +203,18 @@ class PermutationTest extends Specification {
         assert result.isValid()
         result.getNotVerifiedMessage() == "testing not verify"
         assert result.isSavable()
+    }
+
+    def "permutation keys ending with _asTable are formatted as tables"() {
+        when:
+        def myPermutation = new Permutation("Test Name", [aKey: "a", bKey_asTable: "b", cKey: "c", "dKey_asTable": "d"])
+
+        then:
+        myPermutation.parameters["aKey"].toString() == "a"
+        myPermutation.parameters["bKey"].toString() == "b"
+        myPermutation.parameters["cKey"].toString() == "c"
+        myPermutation.parameters["dKey"].toString() == "d"
+
+        expect myPermutation.tableParameters, containsInAnyOrder(["bKey", "dKey"] as Object[])
     }
 }

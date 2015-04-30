@@ -219,7 +219,7 @@ public class ResultsWriter {
             for (Map.Entry<String, Integer> columnEntry : maxColumnLengths.entrySet()) {
                 headerRow += " "+StringUtils.pad(columnEntry.getKey(), columnEntry.getValue())+" |";
             }
-            headerRow += " RESULTS\n";
+            headerRow += " OPERATIONS\n";
 
             String headerSeparator = "| :"+StringUtils.repeat("-", permutationNameColLength - 1)+" | :"+StringUtils.repeat("-", verifiedColLength - 1)+" |";
             for (Map.Entry<String, Integer> columnEntry : maxColumnLengths.entrySet()) {

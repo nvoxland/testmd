@@ -20,21 +20,21 @@ public class TestBuilder {
     /**
      * Creates and configures a new permutation with no parameters.
      */
-    public Permutation permutation() throws Exception {
-        return permutation((Map<String, Object>) null);
+    public Permutation withPermutation() throws Exception {
+        return withPermutation((Map<String, Object>) null);
     }
 
     /**
      * Creates and configures a new permutation which is populated with the map values as parameters.
      */
-    public Permutation permutation(Map<String, Object> parameters) throws Exception {
-        return permutation(new Permutation(testName, parameters));
+    public Permutation withPermutation(Map<String, Object> parameters) throws Exception {
+        return withPermutation(new Permutation(testName, parameters));
     }
 
     /**
      * Registers a custom subclassed {@link testmd.Permutation} with TestMD.
      */
-    public Permutation permutation(Permutation permutation) throws Exception {
+    public Permutation withPermutation(Permutation permutation) throws Exception {
         testManager.addPermutation(testName, permutation);
 
         return permutation;

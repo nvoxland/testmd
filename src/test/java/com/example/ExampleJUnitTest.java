@@ -26,7 +26,7 @@ public class ExampleJUnitTest {
                 .addParameter("tableName", tableName)
                 .addParameter("columns", columns)
                 .addParameter("values", values)
-                .addResult("sql", sql)
+                .addOperation("sql", sql)
                 .setup(new Runnable() {
                     @Override
                     public void run() throws SetupResult {
@@ -73,7 +73,7 @@ public class ExampleJUnitTest {
                     .addParameter("table", tableName)
                     .addParameter("columns", columns)
                     .addParameter("values", values)
-                    .addResult("sql", sql)
+                    .addOperation("sql", sql)
                     .run(new Runnable() {
                         @Override
                         public void run() {
@@ -105,8 +105,8 @@ public class ExampleJUnitTest {
                     .addParameter("table", tableName)
                     .addParameter("columns", columns)
                     .addParameter("values", values)
-                    .asTable("columns", "values")
-                    .addResult("sql", sql)
+                    .formattedAsTable("columns", "values")
+                    .addOperation("sql", sql)
                     .run(new Runnable() {
                         @Override
                         public void run() {
@@ -135,8 +135,8 @@ public class ExampleJUnitTest {
             final String query = logic.generateQueryRequest(version, keywords);
             testmd.permutation().addParameter("keywords", keywords)
                     .addParameter("version", version)
-                    .asTable("keywords", "version")
-                    .addResult("query", query)
+                    .formattedAsTable("keywords", "version")
+                    .addOperation("query", query)
                     .run(new Runnable() {
                         @Override
                         public void run() {

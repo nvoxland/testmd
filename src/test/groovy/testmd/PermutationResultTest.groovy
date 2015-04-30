@@ -15,13 +15,13 @@ class PermutationResultTest extends Specification {
         }
 
         def permutation = new Permutation("Test Name", ["b": 1, "a": 2])
-        permutation.addResult("dataX", "x")
-        permutation.addResult("data5", 5)
-        permutation.addResult("dataCustom", "replace", format)
+        permutation.addOperation("dataX", "x")
+        permutation.addOperation("data5", 5)
+        permutation.addOperation("dataCustom", "replace", format)
         permutation.addNote("noteC", "c")
         permutation.addNote("note8", 8)
         permutation.addNote("noteCustom", "replace", format)
-        permutation.asTable(["b"])
+        permutation.formattedAsTable(["b"])
 
         def result = new PermutationResult.Verified(permutation)
 

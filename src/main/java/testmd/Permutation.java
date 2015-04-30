@@ -10,19 +10,19 @@ import java.util.*;
 
 /**
  * Defines a test permutation to execute.
- * New permutation objects are created through {@link testmd.TestBuilder#permutation()} or {@link testmd.TestBuilder#permutation(java.util.Map)} ) to ensure that they are property managed for saving results.
+ * New permutation objects are created through {@link testmd.TestBuilder#withPermutation()} or {@link testmd.TestBuilder#withPermutation(java.util.Map)} ) to ensure that they are property managed for saving results.
  * <br><br>
  * The lifecycle of a permutation is to call:
  * <ol>
  * <li>A previous run (if any) is looked up by comparing the values stored in {@link #addParameter(String, Object)} with previous runs</li>
- * <li>If a previous run is found and it was "verified", the values from {@link #addResult(String, Object)} are compared with the previous run and if the results are the same this test is assumed to be correct still and finished.</li>
+ * <li>If a previous run is found and it was "verified", the values from {@link #addOperation(String, Object)} are compared with the previous run and if the calls are the same this test is assumed to be correct still and finished.</li>
  * <li>The setup implementation defined by {@link #setup(Runnable)}.</li>
  * <li>If the Setup object pass, the verification test defined by {@link #run(Runnable)} is executed</li>
  * <li>If run throws exceptions, the results are not saved and the test fails. If all permutations pass the results are saved for future tests.</li>
  * <li>Regardless of Setup and Verification, the Runnable object defined by {@link #cleanup(Runnable)} is executed</li>
  * </ol>
  * <br><br>
- * Format and additional information in the saved results can be managed with {@link #addNote(String, Object)} and {@link #asTable(java.util.Collection)}
+ * Format and additional information in the saved results can be managed with {@link #addNote(String, Object)} and {@link #formattedAsTable(java.util.Collection)}
  */
 public class Permutation {
 
@@ -30,7 +30,7 @@ public class Permutation {
 
     private Map<String, Value> parameters = new HashMap<String, Value>();
     private Set<String> tableParameters = new HashSet<String>();
-    private Map<String, Value> results = new HashMap<String, Value>();
+    private Map<String, Value> operations = new HashMap<String, Value>();
     private Map<String, Value> notes = new HashMap<String, Value>();
 
     private Runnable setup;
@@ -81,6 +81,11 @@ public class Permutation {
      * Adds another parameter to uniquely identify this permutation.
      */
     public Permutation addParameter(String key, Object value, ValueFormat valueFormat) {
+        if (key.endsWith("_asTable")) {
+            key = key.substring(0, key.length()-"_asTable".length());
+            formattedAsTable(key);
+        }
+
         parameters.put(key, new Value(value, valueFormat));
         return this;
     }
@@ -96,9 +101,9 @@ public class Permutation {
     /**
      * When formatting results for storage, store the given parameters as a table instead of separately.
      */
-    public Permutation asTable(String... tableParameters) {
+    public Permutation formattedAsTable(String... tableParameters) {
         if (tableParameters != null) {
-            asTable(Arrays.asList(tableParameters));
+            formattedAsTable(Arrays.asList(tableParameters));
         }
 
         return this;
@@ -107,29 +112,22 @@ public class Permutation {
     /**
      * When formatting results for storage, store the given parameters as a table instead of separately.
      */
-    public Permutation asTable(Collection<String> tableParameters) {
+    public Permutation formattedAsTable(Collection<String> tableParameters) {
         if (tableParameters != null) {
             this.tableParameters.addAll(tableParameters);
         }
         return this;
     }
 
-    /**
-     * Convenience method instead of calling {@link #addParameter(String, Object)} then {@link #asTable(java.util.Collection)}
-     */
-    public Permutation asTable(Map<String, Object> parameters) {
-        return asTable(parameters, ValueFormat.DEFAULT);
+    public Permutation addParameters(Map<String, Object> parameters) {
+        return addParameters(parameters, ValueFormat.DEFAULT);
     }
 
-    /**
-     * Convenience method instead of calling {@link #addParameter(String, Object, ValueFormat)} then {@link #asTable(java.util.Collection)}
-     */
-    public Permutation asTable(Map<String, Object> parameters, ValueFormat valueFormat) {
+    public Permutation addParameters(Map<String, Object> parameters, ValueFormat valueFormat) {
         if (parameters != null) {
             for (Map.Entry<String, Object> param : parameters.entrySet()) {
                 addParameter(param.getKey(), param.getValue(), valueFormat);
             }
-            this.tableParameters.addAll(parameters.keySet());
         }
         return this;
     }
@@ -158,29 +156,41 @@ public class Permutation {
     }
 
     /**
-     * Returns the "results" of operation you want to verify.
-     * The operation to generate results should be unit-test fast and is used to determine if the determine if the logic under test has changed how it interacts with the rest of the system.
+     * Returns operation you want to verify.
+     * The operation to generate operations should be unit-test fast and is used to determine if the determine if the logic under test has changed how it interacts with the rest of the system.
      */
-    public Map<String, Value> getResults() {
-        return results;
+    public Map<String, Value> getOperations() {
+        return operations;
     }
 
     /**
-     * Convenience method for {@link #addResult(String, Object, ValueFormat)} using {@link ValueFormat.DefaultFormat}
+     * Convenience method for {@link #addOperation(String, Object, ValueFormat)} using {@link ValueFormat.DefaultFormat}
      */
-    public Permutation addResult(String key, Object value) {
-        addResult(key, value, ValueFormat.DEFAULT);
+    public Permutation addOperation(String key, Object value) {
+        addOperation(key, value, ValueFormat.DEFAULT);
         return this;
     }
 
     /**
-     * Adds another result of the logic under test to compare with previous results and determine if retest is necessary.
+     * Adds another operation of the logic under test to compare with previous operations and determine if retest is necessary.
      */
-    public Permutation addResult(String key, Object value, ValueFormat valueFormat) {
-        results.put(key, new Value(value, valueFormat));
+    public Permutation addOperation(String key, Object value, ValueFormat valueFormat) {
+        operations.put(key, new Value(value, valueFormat));
         return this;
     }
 
+    public Permutation addOperations(Map<String, Object> operations, ValueFormat valueFormat) {
+        if (operations != null) {
+            for (Map.Entry<String, Object> entry : operations.entrySet()) {
+                addOperation(entry.getKey(), entry.getValue(), valueFormat);
+            }
+        }
+        return this;
+    }
+
+    public Permutation addOperations(Map<String, Object> operations) {
+        return addOperations(operations, ValueFormat.DEFAULT);
+    }
     /**
      * Defines the setup logic to use for this permutation.
      * Runnable is passed for cleaner Spock tests, but an exception must be thrown describing if the setup was successful.
@@ -228,7 +238,7 @@ public class Permutation {
     /**
      * Runs this permutation test. This method returns null because it should be called after all setup, cleanup, addParameter, etc. methods.
      * <br><br>
-     * Logic is called only if (previous test results are not defined OR previous results are not verified OR permutation results changed) AND setup returned SetupResult.OK.
+     * Logic is called only if (previous test results are not defined OR previous results are not verified OR permutation operations changed) AND setup returned SetupResult.OK.
      * <br><br>
      * Within your verification logic:
      * <ul>
@@ -307,9 +317,9 @@ public class Permutation {
             if (previousRun.isVerified()) {
                 log.debug("Previous test permutation run was verified");
                 boolean allEqual = true;
-                if (previousRun.getResults().size() == this.getResults().size()) {
+                if (previousRun.getResults().size() == this.getOperations().size()) {
                     for (Map.Entry<String, String> previousData : previousRun.getResults().entrySet()) {
-                        Value thisRunValue = this.getResults().get(previousData.getKey());
+                        Value thisRunValue = this.getOperations().get(previousData.getKey());
                         String previousValue = previousData.getValue();
 
                         if (thisRunValue == null || !thisRunValue.serialize().equals(previousValue)) {
@@ -386,7 +396,7 @@ public class Permutation {
                 String message = "Error executing verification\n" +
                         "Description: " + toString(parameters) + "\n" +
                         "Notes: " + toString(notes) + "\n" +
-                        "Results: " + toString(results);
+                        "Results: " + toString(operations);
                 throw new RuntimeException(message, e);
             }
         } finally {
@@ -410,7 +420,7 @@ public class Permutation {
         return StringUtils.indent(
                 (parameters.size() > 0 ? "Description: " + toString(parameters) + "\n" : "") +
                         (notes.size() > 0 ? "Notes: " + toString(notes) + "\n" : "") +
-                        (results.size() > 0 ? "Results: " + toString(results) : ""), indent);
+                        (operations.size() > 0 ? "Results: " + toString(operations) : ""), indent);
     }
 
 

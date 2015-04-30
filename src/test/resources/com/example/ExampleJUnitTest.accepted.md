@@ -20,7 +20,7 @@
 
 - **table:** person
 
-| Permutation | Verified | columns | values | RESULTS
+| Permutation | Verified | columns | values | OPERATIONS
 | :---------- | :------- | :------ | :----- | :------
 | acf3c1      | true     | age     | 42     | **sql**: INSERT INTO person (age) VALUES (42);
 
@@ -38,6 +38,6 @@
 
 # Test: "queryAPI" #
 
-| Permutation | Verified | keywords           | version | RESULTS
+| Permutation | Verified | keywords           | version | OPERATIONS
 | :---------- | :------- | :----------------- | :------ | :------
 | 85a2c9      | true     | junit alternatives | 3       | **query**: /api/3/search.json?q=junit+alternatives

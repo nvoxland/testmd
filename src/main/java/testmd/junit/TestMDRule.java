@@ -22,10 +22,10 @@ public class TestMDRule extends TestWatcher {
     }
 
     public Permutation permutation(Map<String, Object> parameters) throws Exception {
-        return TestMD.test(testClassName, testName, inSameRootAs).permutation(parameters);
+        return TestMD.test(testClassName, testName, inSameRootAs).withPermutation(parameters);
     }
 
     public Permutation permutation() throws Exception {
-        return TestMD.test(testClassName, testName, inSameRootAs).permutation();
+        return TestMD.test(testClassName, testName, inSameRootAs).withPermutation();
     }
 }
