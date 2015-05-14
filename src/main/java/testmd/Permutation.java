@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class Permutation {
 
-    private String testName;
+    protected String testName;
 
     private Map<String, Value> parameters = new HashMap<String, Value>();
     private Set<String> tableParameters = new HashSet<String>();
@@ -261,12 +261,10 @@ public class Permutation {
             if (e instanceof AssertionError) {
                 message = "Failure running permutation: " + e.getMessage() + "\n";
             }
-            message += toLongString(4);
-
             LoggerFactory.getLogger(getClass()).error(message);
 
             setTestResult(new PermutationResult.Failed());
-            throw new Exception(e);
+            throw e;
         }
     }
 
@@ -312,6 +310,12 @@ public class Permutation {
 
         Logger log = LoggerFactory.getLogger(Permutation.class);
         log.debug("----- Running " + this.toString() + " -----");
+
+        boolean forceRun = this.forceRun;
+
+        if (testName.startsWith("!")) {
+            forceRun = true;
+        }
 
         if (!forceRun && previousRun != null) {
             if (previousRun.isVerified()) {
@@ -380,7 +384,7 @@ public class Permutation {
                 log.error("Error executing cleanup after setup failure", cleanupError);
             }
 
-            throw new RuntimeException(message, e);
+            throw new SetupException(message, e);
         }
 
         Exception cleanupError = null;
@@ -390,13 +394,13 @@ public class Permutation {
             } catch (CannotVerifyException e) {
                 return new PermutationResult.Unverified(e.getMessage(), this);
             } catch (Throwable e) {
-                if (e instanceof AssertionError) {
-                    throw (AssertionError) e;
-                }
-                String message = "Error executing verification\n" +
+                String message = (e instanceof AssertionError?"Assertion Failed":"Error")+" executing verification:\n" +
                         "Description: " + toString(parameters) + "\n" +
-                        "Notes: " + toString(notes) + "\n" +
-                        "Results: " + toString(operations);
+                        "Note(s): " + toString(notes) + "\n" +
+                        "Operation(s): " + toString(operations);
+                if (e instanceof AssertionError) {
+                    throw new AssertionError(message+"\nCaused by: "+e.getMessage(), e);
+                }
                 throw new RuntimeException(message, e);
             }
         } finally {
@@ -419,8 +423,8 @@ public class Permutation {
     protected String toLongString(int indent) {
         return StringUtils.indent(
                 (parameters.size() > 0 ? "Description: " + toString(parameters) + "\n" : "") +
-                        (notes.size() > 0 ? "Notes: " + toString(notes) + "\n" : "") +
-                        (operations.size() > 0 ? "Results: " + toString(operations) : ""), indent);
+                        (notes.size() > 0 ? "Note(s): " + toString(notes) + "\n" : "") +
+                        (operations.size() > 0 ? "Operation(s): " + toString(operations) : ""), indent);
     }
 
 

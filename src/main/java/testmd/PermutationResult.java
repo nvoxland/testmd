@@ -163,6 +163,10 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
      * Returns true if result was verified or if no message was given.
      */
     public String getNotVerifiedMessage() {
+        if (this.notVerifiedMessage != null) {
+            this.notVerifiedMessage = this.notVerifiedMessage.replaceFirst("(?s)[\\r\\n].*","...");
+        }
+
         return notVerifiedMessage;
     }
 

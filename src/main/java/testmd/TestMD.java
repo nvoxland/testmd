@@ -4,6 +4,8 @@ import testmd.storage.ResultsReader;
 import testmd.storage.ResultsWriter;
 import testmd.storage.TestManager;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,34 @@ public class TestMD {
     public TestMD() {
     }
 
+    public static TestBuilder test(Object specificationContext, Class inSameClassRoot) {
+        try {
+            String testName;
+            if (!specificationContext.getClass().getName().equals("org.spockframework.runtime.SpecificationContext")) {
+                throw new RuntimeException("Can only use the TestMD.test(Object, Class) method passing this.specificationContext in Spock tests. You passed a "+specificationContext.getClass().getName()+". Use other versions of Testmd.test() instead.");
+            }
+
+            Object currentIteration = specificationContext.getClass().getMethod("getCurrentIteration").invoke(specificationContext);
+
+            Object parent = currentIteration.getClass().getMethod("getParent").invoke(currentIteration);
+
+            if (parent == null) {
+                testName = (String) currentIteration.getClass().getMethod("getName").invoke(currentIteration);
+            } else {
+                testName = (String) parent.getClass().getMethod("getName").invoke(parent);
+            }
+
+            Object specInfo = specificationContext.getClass().getMethod("getCurrentSpec").invoke(specificationContext);
+            String packageName = (String) specInfo.getClass().getMethod("getPackage").invoke(specInfo);
+            String fileName = ((String) specInfo.getClass().getMethod("getFilename").invoke(specInfo)).replaceFirst("\\..*", "");
+
+            return test(packageName+"."+fileName, testName, inSameClassRoot);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     /**
      * Convenience method for {@link #test(String, String, Class)} for defining a test group based on a class name.
      * The testClass is used for the inSameClassRoot parameter.
@@ -36,8 +66,8 @@ public class TestMD {
     /**
      * Convenience method for {@link #test(String, String, Class)} for defining a test group based on a class name.
      */
-    public static TestBuilder test(Class testClass, String testName, Class isSameClassRoot) {
-        return test(testClass.getName(), testName, isSameClassRoot);
+    public static TestBuilder test(Class testClass, String testName, Class inSameClassRoot) {
+        return test(testClass.getName(), testName, inSameClassRoot);
     }
 
     /**

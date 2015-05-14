@@ -217,4 +217,21 @@ class PermutationTest extends Specification {
 
         expect myPermutation.tableParameters, containsInAnyOrder(["bKey", "dKey"] as Object[])
     }
+
+    def "testName that starts with ! always runs"() {
+        when:
+        permutation.testName = "!Test Name"
+        def previousRun = new PermutationResult.Verified(permutation)
+
+        def result = permutation.run({ executeRunCount++ }, previousRun)
+
+        then:
+        setupRunCount == 1
+        executeRunCount == 1
+        cleanupRunCount == 1
+
+        assert result.isValid()
+        assert result.isVerified()
+        assert result.isSavable()
+    }
 }

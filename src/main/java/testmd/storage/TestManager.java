@@ -128,20 +128,28 @@ public class TestManager {
             }
         }
 
+        boolean onlyOneTestRan = finalResults.size() == 1;
+        for (Map.Entry<String, PreviousResults> entry : this.previousResults.entrySet()) {
+            String testName = entry.getKey();
+
+            if (!finalResults.containsKey(testName)) {
+                if (onlyOneTestRan && this.previousResults.size() > 1) {
+                    //only one test ran this time but there used to be others. Probably running a single test manually
+                    finalResults.put(testName, entry.getValue());
+                } else {
+                    log.info("Test " + testName + " was in the accepted results, but not in the test suite. Removing it from the accepted file.");
+                    somethingRan = true;
+                }
+            }
+        }
+
+
         if (!somethingRan) {
             log.debug("No permutations executed for "+testGroup+", do not write results");
             return;
         }
 
         if (canSave) {
-            for (Map.Entry<String, PreviousResults> entry : this.previousResults.entrySet()) {
-                String testName = entry.getKey();
-
-                if (!finalResults.containsKey(testName)) {
-                    finalResults.put(testName, entry.getValue());
-                }
-            }
-
             resultsWriter.write(getFile(), finalResults.values());
         }
     }
