@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class TestMD {
 
-    private static Map<String, TestManager> testManagers = new HashMap<>();
+    private static Map<String, Map<Class, TestManager>> testManagers = new HashMap<>();
     private static ResultsReader resultsReader = new ResultsReader();
     private static ResultsWriter resultsWriter = new ResultsWriter();
 
@@ -75,11 +75,23 @@ public class TestMD {
      * Results are stored in the same source path as the inSameClassRoot file.
      */
     public static TestBuilder test(String testGroup, String testName, Class inSameClassRoot) {
-        TestManager testManager = testManagers.get(testGroup);
+        Map<Class, TestManager> testManagersByRoot = testManagers.get(testGroup);
+        if (testManagersByRoot == null) {
+            testManagersByRoot = new HashMap<>();
+            testManagers.put(testGroup, testManagersByRoot);
+        }
+
+        Class keyClass = inSameClassRoot;
+        if (keyClass == null) {
+            keyClass = Object.class;
+        }
+
+        TestManager testManager = testManagersByRoot.get(keyClass);
+
         if (testManager == null) {
             testManager = createTestManager(testGroup, inSameClassRoot);
             testManager.init();
-            testManagers.put(testGroup, testManager);
+            testManagersByRoot.put(keyClass, testManager);
         }
         return testManager.getBuilder(testName);
     }
