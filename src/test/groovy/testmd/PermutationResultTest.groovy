@@ -27,7 +27,7 @@ class PermutationResultTest extends Specification {
 
         then:
         result.getResults().toString() == "[data5:5, dataCustom:REP, dataX:x]"
-        result.getParameters().toString() == "[a:2, b:1]"
+        result.getParameters().toString() == "{a=2, b=1}"
         result.getNotes().toString() == "[note8:8, noteC:c, noteCustom:REP]"
         result.getTableParameters().toString() == "[b]"
     }
@@ -105,6 +105,24 @@ class PermutationResultTest extends Specification {
         new PermutationResult.Unverified(null) | true  | false    | true
         new PermutationResult.Failed()         | true  | false    | false
         new PermutationResult.Invalid(null)    | false | false    | true
+    }
 
+    def "recomputeKey doesn't include keys with null values"() {
+        when:
+        PermutationResult resultWithNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b: 2, c: null, d: 3, e: null]));
+        PermutationResult resultWithoutNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b: 2, d: 3]));
+
+        PermutationResult resultWithNullsUsingSetParameters = new PermutationResult.Verified().setParameters([a: "1", b: "2", "c": null, d: "3", e: null]);
+        PermutationResult resultWithNullsFromPermutation = new PermutationResult.Verified(new Permutation("test name", [:]).addParameter("a", 1).addParameter("b", "2").addParameter("c", null).addParameter("d", "3").addParameter("e", null));
+
+        PermutationResult tableResultWithNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b_asTable: 2, c: null, d_asTable: 3, e_asTable: null]));
+        PermutationResult tableResultWithoutNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b_asTable: 2, d_asTable: 3]));
+
+        then:
+        resultWithoutNulls.key == resultWithNulls.key
+        resultWithoutNulls.key == resultWithNullsUsingSetParameters.key
+        resultWithoutNulls.key == resultWithNullsFromPermutation.key
+
+        tableResultWithNulls.key == tableResultWithoutNulls.key
     }
 }

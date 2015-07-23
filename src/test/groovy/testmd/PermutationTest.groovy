@@ -234,4 +234,15 @@ class PermutationTest extends Specification {
         assert result.isVerified()
         assert result.isSavable()
     }
+
+    def "addParameter doesn't actually add null values"() {
+        when:
+        def permutation = new Permutation("test name", [:])
+        permutation.addParameter("a", "value")
+        permutation.addParameter("b", null)
+        permutation.addParameter("c", "value2")
+
+        then:
+        permutation.getParameters().keySet() == ["a", "c"] as Set
+    }
 }

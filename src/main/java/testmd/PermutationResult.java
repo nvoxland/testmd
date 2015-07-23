@@ -51,7 +51,7 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
      * Returns the permutation uniquely-identifying parameters
      */
     public SortedMap<String, String> getParameters() {
-        return parameters;
+        return Collections.unmodifiableSortedMap(parameters);
     }
 
     /**
@@ -276,7 +276,7 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
 
         public Unverified(String message, Permutation permutation) {
             super(permutation);
-            this.notVerifiedMessage = message;
+            this.notVerifiedMessage = permutation.formatNotVerifiedMessage(message);
         }
 
         @Override
@@ -296,7 +296,7 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
 
         public Invalid(String message, Permutation permutation) {
             super(permutation);
-            this.notVerifiedMessage = message;
+            this.notVerifiedMessage = permutation.formatNotVerifiedMessage(message);
         }
 
         @Override

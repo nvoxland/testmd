@@ -81,6 +81,10 @@ public class Permutation {
      * Adds another parameter to uniquely identify this permutation.
      */
     public Permutation addParameter(String key, Object value, ValueFormat valueFormat) {
+        if (value == null) {
+            return this;
+        }
+
         if (key.endsWith("_asTable")) {
             key = key.substring(0, key.length()-"_asTable".length());
             formattedAsTable(key);
@@ -313,8 +317,16 @@ public class Permutation {
 
         boolean forceRun = this.forceRun;
 
+        String forceRunProperty = StringUtils.trimToNull(System.getProperty("testmd.forceRun"));
+        if (forceRunProperty == null) {
+            forceRunProperty = StringUtils.trimToNull(System.getProperty("testmd.forcerun"));
+        }
+        if (forceRunProperty != null && forceRunProperty.equalsIgnoreCase("true")) {
+            forceRun = true;
+        }
         if (testName.startsWith("!")) {
             forceRun = true;
+            testName = testName.substring(1);
         }
 
         if (!forceRun && previousRun != null) {
@@ -438,5 +450,9 @@ public class Permutation {
 
     public boolean wasRan() {
         return wasRan;
+    }
+
+    public String formatNotVerifiedMessage(String message) {
+        return message;
     }
 }
