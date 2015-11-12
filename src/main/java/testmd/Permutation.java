@@ -84,6 +84,12 @@ public class Permutation {
         if (value == null) {
             return this;
         }
+        if (value instanceof Collection && ((Collection) value).size() == 0) {
+            return this;
+        }
+        if (value instanceof Map && ((Map) value).size() == 0) {
+            return this;
+        }
 
         if (key.endsWith("_asTable")) {
             key = key.substring(0, key.length()-"_asTable".length());
