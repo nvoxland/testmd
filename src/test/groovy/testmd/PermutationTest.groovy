@@ -21,7 +21,7 @@ class PermutationTest extends Specification {
         executeRunCount = 0
         cleanupRunCount = 0
 
-        permutation = new Permutation("Test Name", [a: 1, b: 2])
+        permutation = new Permutation("Test Group", "Test Name", [a: 1, b: 2])
                 .addOperation("out", 100)
                 .setup({setupRunCount++; throw SetupResult.OK})
                 .cleanup({ cleanupRunCount++ })
@@ -29,7 +29,7 @@ class PermutationTest extends Specification {
 
     def "constructor with null parameters"() {
         expect:
-        new Permutation("Test Name", null).getParameters().size() == 0
+        new Permutation("Test Group", "Test Name", null).getParameters().size() == 0
     }
 
     def "run with no previous result"() {
@@ -207,7 +207,7 @@ class PermutationTest extends Specification {
 
     def "permutation keys ending with _asTable are formatted as tables"() {
         when:
-        def myPermutation = new Permutation("Test Name", [aKey: "a", bKey_asTable: "b", cKey: "c", "dKey_asTable": "d"])
+        def myPermutation = new Permutation("TestGroup", "Test Name", [aKey: "a", bKey_asTable: "b", cKey: "c", "dKey_asTable": "d"])
 
         then:
         myPermutation.parameters["aKey"].toString() == "a"
@@ -237,7 +237,7 @@ class PermutationTest extends Specification {
 
     def "addParameter doesn't actually add null values"() {
         when:
-        def permutation = new Permutation("test name", [:])
+        def permutation = new Permutation("TestGroup", "test name", [:])
         permutation.addParameter("a", "value")
         permutation.addParameter("b", null)
         permutation.addParameter("c", "value2")

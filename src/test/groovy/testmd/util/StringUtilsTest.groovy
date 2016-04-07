@@ -20,9 +20,6 @@ class StringUtilsTest extends Specification {
 
         where:
         input           | delimiter | sorted | output
-        null            | null      | true   | null
-        null            | null      | false  | null
-        null            | null      | true   | null
         []              | ","       | false  | ""
         ["z", "x", "a"] | ","       | false  | "z,x,a"
         ["z", "x", "a"] | " : "     | false  | "z : x : a"
@@ -179,8 +176,8 @@ class StringUtilsTest extends Specification {
         where:
         input | output
         null | "null"
-        "x" | "11f6ad"
-        "y" | "95cb0b"
+        "x" | "11f6ad8"
+        "y" | "95cb0bf"
 
     }
 

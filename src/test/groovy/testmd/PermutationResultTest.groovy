@@ -14,7 +14,7 @@ class PermutationResultTest extends Specification {
             }
         }
 
-        def permutation = new Permutation("Test Name", ["b": 1, "a": 2])
+        def permutation = new Permutation("Test Group", "Test Name", ["b": 1, "a": 2])
         permutation.addOperation("dataX", "x")
         permutation.addOperation("data5", 5)
         permutation.addOperation("dataCustom", "replace", format)
@@ -109,14 +109,14 @@ class PermutationResultTest extends Specification {
 
     def "recomputeKey doesn't include keys with null values"() {
         when:
-        PermutationResult resultWithNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b: 2, c: null, d: 3, e: null]));
-        PermutationResult resultWithoutNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b: 2, d: 3]));
+        PermutationResult resultWithNulls = new PermutationResult.Verified(new Permutation("Test Group", "test name", [a: 1, b: 2, c: null, d: 3, e: null]));
+        PermutationResult resultWithoutNulls = new PermutationResult.Verified(new Permutation("Test Group", "test name", [a: 1, b: 2, d: 3]));
 
         PermutationResult resultWithNullsUsingSetParameters = new PermutationResult.Verified().setParameters([a: "1", b: "2", "c": null, d: "3", e: null]);
-        PermutationResult resultWithNullsFromPermutation = new PermutationResult.Verified(new Permutation("test name", [:]).addParameter("a", 1).addParameter("b", "2").addParameter("c", null).addParameter("d", "3").addParameter("e", null));
+        PermutationResult resultWithNullsFromPermutation = new PermutationResult.Verified(new Permutation("Test Group", "test name", [:]).addParameter("a", 1).addParameter("b", "2").addParameter("c", null).addParameter("d", "3").addParameter("e", null));
 
-        PermutationResult tableResultWithNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b_asTable: 2, c: null, d_asTable: 3, e_asTable: null]));
-        PermutationResult tableResultWithoutNulls = new PermutationResult.Verified(new Permutation("test name", [a: 1, b_asTable: 2, d_asTable: 3]));
+        PermutationResult tableResultWithNulls = new PermutationResult.Verified(new Permutation("Test Group", "test name", [a: 1, b_asTable: 2, c: null, d_asTable: 3, e_asTable: null]));
+        PermutationResult tableResultWithoutNulls = new PermutationResult.Verified(new Permutation("Test Group", "test name", [a: 1, b_asTable: 2, d_asTable: 3]));
 
         then:
         resultWithoutNulls.key == resultWithNulls.key

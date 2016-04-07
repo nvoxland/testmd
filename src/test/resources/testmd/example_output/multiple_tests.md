@@ -2,7 +2,7 @@
 
 # Test: "multiple test" #
 
-## Permutation 044ea5 (verified) ##
+## Permutation 044ea5f (verified) ##
 
 - **Group Param:** a
 - **String Parameter 1:** Just param 1 on permutation 3
@@ -13,7 +13,7 @@
 
 ---------------------------------------
 
-## Permutation 1a273d (verified) ##
+## Permutation 1a273d7 (verified) ##
 
 - **Class Parameter:** java.lang.Integer.class
 - **Group Param:** a
@@ -39,7 +39,7 @@
 
 # Test: "multiple test: part 2" #
 
-## Permutation 3c83d6 _NOT VERIFIED: Was too lazy_ ##
+## Permutation 3c83d6b _NOT VERIFIED: Was too lazy_ ##
 
 - **Group Param:** b
 - **String Parameter 1:** param 1 on permutation 2
@@ -51,7 +51,7 @@
 
 ---------------------------------------
 
-## Permutation 85c6a2 (verified) ##
+## Permutation 85c6a26 (verified) ##
 
 - **Group Param:** b
 - **Multiline Parameter =>**

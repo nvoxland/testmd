@@ -8,7 +8,7 @@
 
 | Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
-| b44a96      | true     | tp1 is a      | tp2 is a      |               |                | **out data**: Permutation 1
+| b44a968     | true     | tp1 is a      | tp2 is a      |               |                | **out data**: Permutation 1
 
 ---------------------------------------
 
@@ -18,8 +18,8 @@
 
 | Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
-| 950940      | Too dark |               |               |               | tpx1 is a      | **out data**: Permutation 6
-| 1390e9      | false    |               |               |               | tpx1 is b      | **out data**: Permutation 7<br>With a second line with &#124; chars<br>And another with &#124; chars
+| 9509406     | Too dark |               |               |               | tpx1 is a      | **out data**: Permutation 6
+| 1390e95     | false    |               |               |               | tpx1 is b      | **out data**: Permutation 7<br>With a second line with &#124; chars<br>And another with &#124; chars
 
 ---------------------------------------
 
@@ -29,9 +29,9 @@
 
 | Permutation | Verified         | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :--------------- | :------------ | :------------ | :------------ | :------------- | :------
-| e35a78      | false            |               | tp2 is b      |               |                | **out data**: Permutation 2
-| bc2594      | false            |               | tp2 is e      |               |                | **out data**: Permutation 5
-| 26172b      | Too lazy to test | tp1 is d      | tp2 is d      | tp3 is d      |                | __more info__: Some notes for this
+| e35a789     | false            |               | tp2 is b      |               |                | **out data**: Permutation 2
+| bc25949     | false            |               | tp2 is e      |               |                | **out data**: Permutation 5
+| 26172b7     | Too lazy to test | tp1 is d      | tp2 is d      | tp3 is d      |                | __more info__: Some notes for this
 |             |                  |               |               |               |                | __yet more info__: Even more notes for this
 |             |                  |               |               |               |                | **more out data**: Permutation 4 extra data
 |             |                  |               |               |               |                | **out data**: Permutation 4
@@ -46,7 +46,7 @@
 
 | Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
-| 8fee93      | true     |               | tp2 is b      |               |                | **String data**: No notes, just one data
+| 8fee938     | true     |               | tp2 is b      |               |                | **String data**: No notes, just one data
 
 ---------------------------------------
 
@@ -56,17 +56,17 @@
 
 | Permutation | Verified | table param 1 | table param 2 | table param 3 | table param x1 | OPERATIONS
 | :---------- | :------- | :------------ | :------------ | :------------ | :------------- | :------
-| 1cf80c      | true     | tp1 is c      | tp2 is c      | tp3 is c      |                | __more info__: Some notes for permutation 3
+| 1cf80ce     | true     | tp1 is c      | tp2 is c      | tp3 is c      |                | __more info__: Some notes for permutation 3
 |             |          |               |               |               |                | **out data**: Permutation 3
 
 # Test: "can snapshot all tables in catalog" #
 
 | Permutation | Verified | catalogName | OPERATIONS
 | :---------- | :------- | :---------- | :------
-| 0cf0db      | true     | LIQUIBASE   | **plan**: getTables(null, LIQUIBASE, null, [TABLE])
+| 0cf0dbe     | true     | LIQUIBASE   | **plan**: getTables(null, LIQUIBASE, null, [TABLE])
 
 # Test: "can snapshot all tables in schema" #
 
 | Permutation | Verified | schemaName | OPERATIONS
 | :---------- | :------- | :--------- | :------
-| 7f92a0      | true     | LBSCHEMA2  | **plan**: getTables(null, LBSCHEMA2, null, [TABLE])
+| 7f92a05     | true     | LBSCHEMA2  | **plan**: getTables(null, LBSCHEMA2, null, [TABLE])

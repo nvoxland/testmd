@@ -352,7 +352,10 @@ public class Permutation {
         }
 
         if (!forceRun && previousRun != null) {
-            String currentHash = testManager.getCurrentTestHash(testGroup);
+            String currentHash = null;
+            if (testManager != null) {
+                currentHash = testManager.getCurrentTestHash(testGroup);
+            }
             String savedHash = previousRun.getTestHash();
 
             if (currentHash != null && savedHash != null && !currentHash.equals(savedHash)) {
