@@ -73,6 +73,10 @@ public class StringUtils {
         return join(collection, delimiter, STANDARD_STRING_FORMAT, sorted);
     }
 
+    public static String join(Map map, String delimiter, boolean sorted) {
+        return join(map, delimiter, STANDARD_STRING_FORMAT, sorted);
+    }
+
     /**
      * Joins entries in a map into a string using the format "KEY=VALUE".
      * If delimiter is null, defaults to ","
@@ -171,7 +175,7 @@ public class StringUtils {
         }
         byte[] digestBytes = digest.digest();
 
-        return new String(encodeHex(digestBytes)).substring(0, 6);
+        return new String(encodeHex(digestBytes)).substring(0, 7);
 
     }
 
@@ -180,7 +184,7 @@ public class StringUtils {
      * The returned array will be double the length of the passed array, as it takes two characters to represent any
      * given byte.
      */
-    private static char[] encodeHex(byte[] data) {
+    public static char[] encodeHex(byte[] data) {
         char[] DIGITS_LOWER = {
                 '0', '1', '2', '3', '4', '5', '6', '7',
                 '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'

@@ -19,6 +19,7 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
 
     private String key = "";
     private String tableKey = "";
+    private String testHash;
 
     /**
      * Creates an empty PermutationResult
@@ -168,6 +169,14 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
         }
 
         return notVerifiedMessage;
+    }
+
+    public String getTestHash() {
+        return testHash;
+    }
+
+    public void setTestHash(String testHash) {
+        this.testHash = testHash;
     }
 
     /**

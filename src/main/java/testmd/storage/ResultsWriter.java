@@ -19,7 +19,7 @@ public class ResultsWriter {
     public static final String SEPARATOR = "---------------------------------------";
     boolean wroteWarning = false;
 
-    public void write(File file, Collection<PreviousResults> results) {
+    public void write(File file, String testHash, Collection<PreviousResults> results) {
 
         SortedSet<PreviousResults> sortedResults = new TreeSet<>(new Comparator<PreviousResults>() {
             @Override
@@ -37,9 +37,12 @@ public class ResultsWriter {
 
 
             try (FileWriter fileWriter = new FileWriter(file)) {
-                for (PreviousResults service : results) {
-                    resultsWriter.write(service.getTestClass(), service.getTestName(), service.getResults(), fileWriter);
+                for (PreviousResults result : results) {
+                    resultsWriter.write(result.getTestClass(), result.getTestName(), result.getResults(), fileWriter);
                 }
+
+                fileWriter.write("\n");
+                fileWriter.write("# Test Version: \""+testHash+"\" #");
             }
         } catch (Throwable e) {
             e.printStackTrace();

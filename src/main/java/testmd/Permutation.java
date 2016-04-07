@@ -1,9 +1,11 @@
 package testmd;
 
+import org.junit.internal.AssumptionViolatedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import testmd.logic.*;
 import testmd.storage.TestManager;
+import testmd.util.LogUtil;
 import testmd.util.StringUtils;
 
 import java.util.*;
@@ -26,7 +28,10 @@ import java.util.*;
  */
 public class Permutation {
 
+    protected String testGroup;
     protected String testName;
+
+    private String key;
 
     private Map<String, Value> parameters = new HashMap<String, Value>();
     private Set<String> tableParameters = new HashSet<String>();
@@ -42,7 +47,8 @@ public class Permutation {
     private PermutationResult testResult;
     private boolean wasRan = false;
 
-    protected Permutation(String testName, Map<String, Object> parameters) {
+    protected Permutation(String testGroup, String testName, Map<String, Object> parameters) {
+        this.testGroup = testGroup;
         this.testName = testName;
         if (parameters != null) {
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
@@ -66,7 +72,7 @@ public class Permutation {
      * Returns the parameters that uniquely identify this permutation.
      */
     public Map<String, Value> getParameters() {
-        return parameters;
+        return Collections.unmodifiableMap(parameters);
     }
 
     /**
@@ -92,11 +98,12 @@ public class Permutation {
         }
 
         if (key.endsWith("_asTable")) {
-            key = key.substring(0, key.length()-"_asTable".length());
+            key = key.substring(0, key.length() - "_asTable".length());
             formattedAsTable(key);
         }
 
         parameters.put(key, new Value(value, valueFormat));
+        this.key = null;
         return this;
     }
 
@@ -201,6 +208,7 @@ public class Permutation {
     public Permutation addOperations(Map<String, Object> operations) {
         return addOperations(operations, ValueFormat.DEFAULT);
     }
+
     /**
      * Defines the setup logic to use for this permutation.
      * Runnable is passed for cleaner Spock tests, but an exception must be thrown describing if the setup was successful.
@@ -263,6 +271,10 @@ public class Permutation {
             throw new RuntimeException("No TestManager set");
         }
 
+        Permutation duplicateKey = testManager.isDuplicateKey(testName, this);
+        if (duplicateKey != null) {
+            throw new RuntimeException("Key collision with another permutation. Make sure parameters fully differentiate all permutations.\nPermutation: " + this.toString() + "\nalso matches: " +duplicateKey.toString()+"\nwith operation "+StringUtils.join(duplicateKey.getOperations(), ",", false));
+        }
         PermutationResult previousResult = testManager.getPreviousResult(testName, this);
         try {
             this.setTestResult(run(verification, previousResult));
@@ -282,16 +294,19 @@ public class Permutation {
      * Returns the "key" used to uniquely identify this permutation. The key is used to lookup previous results and to manually search & find particular permutations.
      */
     public String getKey() {
-        if (parameters.size() == 0) {
-            return "";
-        } else {
-            return StringUtils.computeHash(StringUtils.join(parameters, ",", StringUtils.STANDARD_STRING_FORMAT, true));
+        if (key == null) { //store computed key for performance reasons. Must clear out key attribute whenever parameters change
+            if (parameters.size() == 0) {
+                key = "";
+            } else {
+                key = StringUtils.computeHash(StringUtils.join(parameters, ",", StringUtils.STANDARD_STRING_FORMAT, true));
+            }
         }
+        return key;
     }
 
     @Override
     public String toString() {
-        return "Test \""+testName+"\", Permutation [" + StringUtils.join(getParameters(), ", ", StringUtils.STANDARD_STRING_FORMAT, false) + "]";
+        return "Test \"" + testName + "\", Permutation [" + StringUtils.join(getParameters(), ", ", StringUtils.STANDARD_STRING_FORMAT, false) + "]";
     }
 
     /**
@@ -328,11 +343,22 @@ public class Permutation {
             forceRunProperty = StringUtils.trimToNull(System.getProperty("testmd.forcerun"));
         }
         if (forceRunProperty != null && forceRunProperty.equalsIgnoreCase("true")) {
+            LogUtil.warnOnce(log, "Forcing execution due to testmd.forcerun=true system property");
             forceRun = true;
         }
         if (testName.startsWith("!")) {
             forceRun = true;
             testName = testName.substring(1);
+        }
+
+        if (!forceRun && previousRun != null) {
+            String currentHash = testManager.getCurrentTestHash(testGroup);
+            String savedHash = previousRun.getTestHash();
+
+            if (currentHash != null && savedHash != null && !currentHash.equals(savedHash)) {
+                LogUtil.warnOnce(log, "Forcing execution of all tests in " + testGroup + " due to version/hash change");
+                forceRun = true;
+            }
         }
 
         if (!forceRun && previousRun != null) {
@@ -363,7 +389,7 @@ public class Permutation {
                 log.debug("Previous test permutation run was NOT verified");
             }
         } else if (forceRun) {
-            log.warn("FORCE RUN TEST");
+            LogUtil.warnOnce(log, "FORCE RUN TEST");
         }
 
         try {
@@ -387,7 +413,7 @@ public class Permutation {
                     log.warn("Test permutation setup is not valid: " + result.getMessage() + "\n" + toLongString(4));
                     return new PermutationResult.Invalid(result.getMessage(), this);
                 } else if (!result.canVerify()) {
-                    log.warn("Cannot verify: " + result.getMessage() + "\n" + toLongString(4));
+                    log.debug("Cannot verify: " + result.getMessage() + "\n" + toLongString(4));
                     return new PermutationResult.Unverified(result.getMessage(), this);
                 }
             }
@@ -402,7 +428,11 @@ public class Permutation {
                 log.error("Error executing cleanup after setup failure", cleanupError);
             }
 
-            throw new SetupException(message, e);
+            if (e instanceof AssumptionViolatedException) {
+                throw e;
+            } else {
+                throw new SetupException(message, e);
+            }
         }
 
         Exception cleanupError = null;
@@ -412,12 +442,12 @@ public class Permutation {
             } catch (CannotVerifyException e) {
                 return new PermutationResult.Unverified(e.getMessage(), this);
             } catch (Throwable e) {
-                String message = (e instanceof AssertionError?"Assertion Failed":"Error")+" executing verification:\n" +
+                String message = (e instanceof AssertionError ? "Assertion Failed" : "Error") + " executing verification:\n" +
                         "Description: " + toString(parameters) + "\n" +
                         "Note(s): " + toString(notes) + "\n" +
                         "Operation(s): " + toString(operations);
                 if (e instanceof AssertionError) {
-                    throw new AssertionError(message+"\nCaused by: "+e.getMessage(), e);
+                    throw new AssertionError(message + "\nCaused by: " + e.getMessage(), e);
                 }
                 throw new RuntimeException(message, e);
             }

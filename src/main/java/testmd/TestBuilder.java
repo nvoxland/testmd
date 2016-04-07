@@ -5,10 +5,12 @@ import testmd.storage.TestManager;
 import java.util.Map;
 
 public class TestBuilder {
+    private String testGroup;
     private String testName;
     private TestManager testManager;
 
-    public TestBuilder(String testName, TestManager testManager) {
+    public TestBuilder(String testGroup, String testName, TestManager testManager) {
+        this.testGroup = testGroup;
         this.testName = testName;
         this.testManager = testManager;
     }
@@ -28,7 +30,7 @@ public class TestBuilder {
      * Creates and configures a new permutation which is populated with the map values as parameters.
      */
     public Permutation withPermutation(Map<String, Object> parameters) throws Exception {
-        return withPermutation(new Permutation(testName, parameters));
+        return withPermutation(new Permutation(testGroup, testName, parameters));
     }
 
     /**

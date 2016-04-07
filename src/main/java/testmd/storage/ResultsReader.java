@@ -1,5 +1,6 @@
 package testmd.storage;
 
+import testmd.Permutation;
 import testmd.PermutationResult;
 import testmd.PreviousResults;
 import testmd.util.StringUtils;
@@ -35,6 +36,7 @@ public class ResultsReader {
         Pattern multiLineKeyValuePattern = Pattern.compile("\\- \\*\\*(.+) =>\\*\\*");
         Pattern resultDetailsMatcher = Pattern.compile("\\*\\*(.*?)\\*\\*: (.*)");
         Pattern notesDetailsMatcher = Pattern.compile("__(.*?)__: (.*)");
+        Pattern testVersionPattern = Pattern.compile("# Test Version: \"(.*)\" #");
 
         List<String> thisTableColumns = null;
         BufferedReader bufferedReader = new BufferedReader(reader);
@@ -50,6 +52,8 @@ public class ResultsReader {
         boolean firstTableRow = true;
 
         Set<String> tableColumns = new HashSet<>();
+
+        String testHash = null;
 
         while ((line = bufferedReader.readLine()) != null) {
             lineNumber++;
@@ -67,6 +71,13 @@ public class ResultsReader {
 
                 previousResults = new PreviousResults(testClass, headerMatcher.group(1));
                 returnList.add(previousResults);
+                continue;
+            }
+
+
+            Matcher testVersionMatcher = testVersionPattern.matcher(line);
+            if (testVersionMatcher.matches()) {
+                testHash = testVersionMatcher.group(1);
                 continue;
             }
 
@@ -240,6 +251,13 @@ public class ResultsReader {
             }
         }
         saveLastPermutation(currentPermutationDetails, previousResults, tableColumns);
+
+        for (PreviousResults result : returnList) {
+            for (PermutationResult permutation : result.getResults()) {
+                permutation.setTestHash(testHash);
+            }
+        }
+
 
         return returnList;
     }
