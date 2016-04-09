@@ -273,7 +273,7 @@ public class Permutation {
 
         Permutation duplicateKey = testManager.isDuplicateKey(testName, this);
         if (duplicateKey != null) {
-            throw new RuntimeException("Key collision with another permutation. Make sure parameters fully differentiate all permutations.\nPermutation: " + this.toString() + "\nalso matches: " +duplicateKey.toString()+"\nwith operation "+StringUtils.join(duplicateKey.getOperations(), ",", false));
+            throw new RuntimeException("Key collision with another permutation. Make sure parameters fully differentiate all permutations.\nPermutation: " + this.toString() + "\nalso matches: " + duplicateKey.toString() + "\nwith operation " + StringUtils.join(duplicateKey.getOperations(), ",", false));
         }
         PermutationResult previousResult = testManager.getPreviousResult(testName, this);
         try {
@@ -295,11 +295,7 @@ public class Permutation {
      */
     public String getKey() {
         if (key == null) { //store computed key for performance reasons. Must clear out key attribute whenever parameters change
-            if (parameters.size() == 0) {
-                key = "";
-            } else {
-                key = StringUtils.computeHash(StringUtils.join(parameters, ",", StringUtils.STANDARD_STRING_FORMAT, true));
-            }
+            key = StringUtils.computeKey(parameters);
         }
         return key;
     }

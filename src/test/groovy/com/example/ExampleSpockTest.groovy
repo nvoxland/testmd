@@ -69,7 +69,7 @@ class ExampleSpockTest extends Specification {
         "cars"               | 4
         "testing examples"   | 3
         "junit alternatives" | 3
-        "junit alternatives" | 3
+        "junit alternatives" | 5
     }
 
     def assertQueryResults(query, keywords) {

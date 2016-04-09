@@ -126,7 +126,7 @@ public class ExampleJUnitTest {
                 new Object[]{"cars", 4},
                 new Object[]{"testing examples", 3},
                 new Object[]{"junit alternatives", 3},
-                new Object[]{"junit alternatives", 3}
+                new Object[]{"junit alternatives", 5}
         };
 
         for (Object[] permutation : permutations) {

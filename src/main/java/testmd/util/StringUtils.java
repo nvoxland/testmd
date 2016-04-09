@@ -14,6 +14,30 @@ import java.util.*;
  */
 public class StringUtils {
 
+    public static String computeKey(Map parameters) {
+        if (parameters == null) {
+            return null;
+        }
+        if (parameters.size() == 0) {
+            return "";
+        } else {
+            List<String> list = new ArrayList<String>();
+
+            JoinFormat format = StringUtils.STANDARD_STRING_FORMAT;
+            SortedMap sortedMap = new TreeMap(format);
+            sortedMap.putAll(parameters);
+
+            for (Map.Entry entry : (Set<Map.Entry>) sortedMap.entrySet()) {
+                String value = StringUtils.trimToNull(format.toString(entry.getValue()));
+                if (value != null) {
+                    list.add(format.toString(entry.getKey()) + "=" + value);
+                }
+            }
+
+            return StringUtils.computeHash(join(list, ",", format, false));
+        }
+    }
+
     /**
      * Fully reads the given stream as a string. Closes the stream when finished, even if an exception occurs.
      */

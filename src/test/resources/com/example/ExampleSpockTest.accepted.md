@@ -2,7 +2,7 @@
 
 # Test: "inserting data" #
 
-## Permutation 8ca304 (verified) ##
+## Permutation 8ca3042 (verified) ##
 
 - **columns:** address1, address2, city
 - **table:** address
@@ -14,7 +14,7 @@
 
 ---------------------------------------
 
-## Permutation 99c155 (verified) ##
+## Permutation 99c1556 (verified) ##
 
 - **columns:** name, age
 - **table:** person
@@ -26,7 +26,7 @@
 
 ---------------------------------------
 
-## Permutation acf3c1 (verified) ##
+## Permutation acf3c1a (verified) ##
 
 - **columns:** age
 - **table:** person
@@ -38,7 +38,7 @@
 
 ---------------------------------------
 
-## Permutation faa682 (verified) ##
+## Permutation faa682a (verified) ##
 
 - **columns:** name
 - **table:** person
@@ -54,9 +54,9 @@
 
 | Permutation | Verified | columns   | values  | OPERATIONS
 | :---------- | :------- | :-------- | :------ | :------
-| acf3c1      | true     | age       | 42      | **sql**: INSERT INTO person (age) VALUES (42);
-| faa682      | true     | name      | Bob     | **sql**: INSERT INTO person (name) VALUES ('Bob');
-| 99c155      | true     | name, age | Joe, 55 | **sql**: INSERT INTO person (name, age) VALUES ('Joe', 55);
+| acf3c1a     | true     | age       | 42      | **sql**: INSERT INTO person (age) VALUES (42);
+| faa682a     | true     | name      | Bob     | **sql**: INSERT INTO person (name) VALUES ('Bob');
+| 99c1556     | true     | name, age | Joe, 55 | **sql**: INSERT INTO person (name, age) VALUES ('Joe', 55);
 
 ---------------------------------------
 
@@ -64,13 +64,16 @@
 
 | Permutation | Verified | columns                  | values                   | OPERATIONS
 | :---------- | :------- | :----------------------- | :----------------------- | :------
-| 8ca304      | true     | address1, address2, city | 121 Main, null, New Town | **sql**: INSERT INTO address (address1, address2, city) VALUES ('121 Main', NULL, 'New Town');
-| ee2339      | true     | address1, address2, city | null, null, null         | **sql**: INSERT INTO address (address1, address2, city) VALUES (NULL, NULL, NULL);
+| 8ca3042     | true     | address1, address2, city | 121 Main, null, New Town | **sql**: INSERT INTO address (address1, address2, city) VALUES ('121 Main', NULL, 'New Town');
+| ee2339b     | true     | address1, address2, city | null, null, null         | **sql**: INSERT INTO address (address1, address2, city) VALUES (NULL, NULL, NULL);
 
 # Test: "query API" #
 
 | Permutation | Verified | keywords           | version | OPERATIONS
 | :---------- | :------- | :----------------- | :------ | :------
-| 9d364d      | true     | cars               | 4       | **query**: /api/4/search.json?q=cars
-| 85a2c9      | true     | junit alternatives | 3       | **query**: /api/3/search.json?q=junit+alternatives
-| 6c2035      | true     | testing examples   | 3       | **query**: /api/3/search.json?q=testing+examples
+| 9d364d7     | true     | cars               | 4       | **query**: /api/4/search.json?q=cars
+| 85a2c92     | true     | junit alternatives | 3       | **query**: /api/3/search.json?q=junit+alternatives
+| eed6284     | true     | junit alternatives | 5       | **query**: /api/5/search.json?q=junit+alternatives
+| 6c20352     | true     | testing examples   | 3       | **query**: /api/3/search.json?q=testing+examples
+
+# Test Version: "03f080" #

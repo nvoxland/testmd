@@ -84,6 +84,7 @@
 | :---------- | :------- | :----------------- | :------ | :------
 | 9d364d7     | true     | cars               | 4       | **query**: /api/4/search.json?q=cars
 | 85a2c92     | true     | junit alternatives | 3       | **query**: /api/3/search.json?q=junit+alternatives
+| eed6284     | true     | junit alternatives | 5       | **query**: /api/5/search.json?q=junit+alternatives
 | 6c20352     | true     | testing examples   | 3       | **query**: /api/3/search.json?q=testing+examples
 
-# Test Version: "b2856c" #
+# Test Version: "3d0cfd" #

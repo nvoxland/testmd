@@ -205,21 +205,16 @@ public abstract class PermutationResult implements Comparable<PermutationResult>
                 }
 
             }
-            tableKey = toKey(tableDescription);
+            tableKey = StringUtils.computeKey(tableDescription);
         } else {
             tableKey = "";
         }
         if (parameters.size() == 0) {
             key = "";
         } else {
-            key = toKey(parameters);
+            key = StringUtils.computeKey(parameters);
         }
     }
-
-    protected String toKey(Map<String, String> description) {
-        return StringUtils.computeHash(StringUtils.join(description, ",", StringUtils.STANDARD_STRING_FORMAT, true));
-    }
-
 
     @Override
     public int compareTo(PermutationResult o) {
